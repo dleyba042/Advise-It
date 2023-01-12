@@ -3,8 +3,8 @@
 ini_set('display_errors',1);
 error_reporting(E_ALL);
 
-require("/home/dleybab1/dbcreds.php");
-$cnxn = mysqli_connect($host,$username,$password,$database)
+require("/home/dleybab1/PDOConfig.php");
+$cnxn = new PDO(DB_DSN,DB_USERNAME,DB_PASSWORD)
 or die("Error Connecting to database");
 
 ?>
@@ -22,11 +22,16 @@ or die("Error Connecting to database");
     <h1>Welcome to the Advise-It Tool</h1>
 
     <?php
+
         $sql = "SELECT * FROM `StudentTokens`";
-        $result = mysqli_query($cnxn,$sql);
-        while($row = mysqli_fetch_array($result))
+        //Using PDO now so prepare
+        $statement = $cnxn->prepare($sql);
+        //Execute the PDO statement
+        $statement->execute();
+        
+        while($result = $statement->fetch((PDO::FETCH_ASSOC)))
         {
-          echo $row['Unique_Token'];
+          echo $result['Unique_Token'] . "<br>";
         }
         echo "<h3> I will be sure to advise you now!!</h3>"
     ?>

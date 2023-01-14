@@ -23,17 +23,44 @@ or die("Error Connecting to database");
 
     <?php
 
-        $sql = "SELECT * FROM `StudentTokens`";
+      //WHat we really need to do is
+      $sql = "SELECT * FROM `StudentTokens`";
         //Using PDO now so prepare
-        $statement = $cnxn->prepare($sql);
+      $statement = $cnxn->prepare($sql);
         //Execute the PDO statement
-        $statement->execute();
+      $statement->execute();
+
+      //Fetch a list of all the tokens created so far
+      $existingTokens = $statement->fetchAll((PDO::FETCH_ASSOC));
+      
+      /*
+      generates a unique ID and checks it against the existing ID's.
+      Generates a replacement while the generated ID exists in the database.
+      */
+      function generateUnique($existing)
+      {
+        $generatedtoken = null;
+        $keepGoing = false;
+
+        do {
+          $generatedtoken = uniqid();
+          foreach ($existing as $token) 
+          {
+            if ($generatedtoken == $token['Unique_Token']) 
+            {
+              $keepGoing = true;
+              break;
+            }
+          }
+        } while ($keepGoing);
+
+        return $generatedtoken;
+      }
+
+    $token = generateUnique($existingTokens);
+
         
-        while($result = $statement->fetch((PDO::FETCH_ASSOC)))
-        {
-          echo $result['Unique_Token'] . "<br>";
-        }
-        echo "<h3> I will be sure to advise you now!!</h3>"
+      
     ?>
     </form>
 

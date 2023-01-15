@@ -63,9 +63,16 @@ or die("Error Connecting to database");
       $insertStatement = $cnxn->prepare($insertSql);
       $insertStatement->bindParam(":token",$token);
       $insertStatement->execute();
-      
+
+    echo
+      "
+      <div id='token_div'>
+      <h4> https://dleyba-brown.greenriverdev.com/CapstoneProject/View/?planID=".$token."</h4>
+      <div>
+      ";
+
     ?>
-    </form>
+
 
   </body>
 </html>

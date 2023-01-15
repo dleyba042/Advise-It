@@ -24,7 +24,7 @@ or die("Error Connecting to database");
     <?php
 
       //WHat we really need to do is
-      $sql = "SELECT * FROM `StudentTokens`";
+      $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
         //Using PDO now so prepare
       $statement = $cnxn->prepare($sql);
         //Execute the PDO statement
@@ -57,9 +57,12 @@ or die("Error Connecting to database");
         return $generatedtoken;
       }
 
-    $token = generateUnique($existingTokens);
-
-        
+      //Stratement to insert the token  
+      $insertSql = "INSERT INTO `StudentPlans`(`unique_token`) VALUES (:token)";  
+      $token = generateUnique($existingTokens);
+      $insertStatement = $cnxn->prepare($insertSql);
+      $insertStatement->bindParam(":token",$token);
+      $insertStatement->execute();
       
     ?>
     </form>

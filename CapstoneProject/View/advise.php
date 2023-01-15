@@ -7,6 +7,9 @@ require("/home/dleybab1/PDOConfig.php");
 $cnxn = new PDO(DB_DSN,DB_USERNAME,DB_PASSWORD)
 or die("Error Connecting to database");
 
+//START A PHP SESSION
+session_start();
+
 ?>
 
 <!DOCTYPE html>
@@ -19,20 +22,22 @@ or die("Error Connecting to database");
     <link rel="stylesheet" href="../Styles/style.css" />
   </head>
   <body>
-    <h1>Welcome to the Advise-It Tool</h1>
 
+    <h1>Welcome to the Advise-It Tool</h1>
     <?php
+
+    if (!$_SERVER['QUERY_STRING']) {
 
       //WHat we really need to do is
       $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
-        //Using PDO now so prepare
+      //Using PDO now so prepare
       $statement = $cnxn->prepare($sql);
-        //Execute the PDO statement
+      //Execute the PDO statement
       $statement->execute();
 
       //Fetch a list of all the tokens created so far
       $existingTokens = $statement->fetchAll((PDO::FETCH_ASSOC));
-      
+
       /*
       generates a unique ID and checks it against the existing ID's.
       Generates a replacement while the generated ID exists in the database.
@@ -44,10 +49,8 @@ or die("Error Connecting to database");
 
         do {
           $generatedtoken = uniqid();
-          foreach ($existing as $token) 
-          {
-            if ($generatedtoken == $token['Unique_Token']) 
-            {
+          foreach ($existing as $token) {
+            if ($generatedtoken == $token['Unique_Token']) {
               $keepGoing = true;
               break;
             }
@@ -58,75 +61,33 @@ or die("Error Connecting to database");
       }
 
       //Stratement to insert the token  
-      $insertSql = "INSERT INTO `StudentPlans`(`unique_token`) VALUES (:token)";  
+      $insertSql = "INSERT INTO `StudentPlans`(`unique_token`,`last_saved`) VALUES (:token,:saved)";
+      $saved = date_create('now')->format('Y-m-d H:i:s');
       $token = generateUnique($existingTokens);
       $insertStatement = $cnxn->prepare($insertSql);
-      $insertStatement->bindParam(":token",$token);
+      $insertStatement->bindParam(":token", $token);
+      $insertStatement->bindParam(":saved", $saved);
       $insertStatement->execute();
 
-    echo
+      $_SESSION["token"] = $token;
+      $_SESSION["saved"] = $saved;
+
+     
+      include("form_template.php");
+  
+
+    }
+    else
+    {
+      ##THIS is where I will display the editable and savable version of any viewed Plan
+      include("form_template.php");
+      echo
       "
-      <div id='token_div' style = 'border: 10px solid black; text-align:center';>
-      <h4> Link with unique token: 
-      https://dleyba-brown.greenriverdev.com/CapstoneProject/View/?planID=".$token."</h4>
-      </div>
+      <script src='../JS/advise.js' type='text/javascript'> </script>
       ";
+    }
 
-    ?>
-
-    <form action="#" method = "post">  
-    <div id = "main_container">  
-      
-
-      <div class = "textContainer">
-
-        <h5>Fall</h5>
-        <textarea id = "fall">
-        </textarea>  
-      
-      </div>  
-
-      <div class = "textContainer">
-
-        <h5>Winter</h5>
-        <textarea id = "winter">
-        </textarea>  
-        
-      
-      </div>  
-
-      <div class = "textContainer">
-
-        <h5>Spring</h5>
-        <textarea id = "spring">
-        </textarea>  
-      
-      </div>  
-
-      <div class = "textContainer">
-
-        <h5>Summer</h5>
-        <textarea id = "summer">
-        </textarea>  
-      
-      </div>  
-
-    </div>
-    <br>
-    <br>
-    <br>
-    </form>
-
-    <div id = "button_div">
-        <button id="submit_button" type="submit"> SAVE </button>  
-    </div>
-   
-    <?php
-
-    $lastSavedValue = date_create('now')->format('Y-m-d H:i:s');
-
-    echo "<h5 style = 'text-align:center; '> Last saved on $lastSavedValue </h5";
-
+    
     ?>
 
 

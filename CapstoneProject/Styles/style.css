@@ -6,6 +6,10 @@ h1 {
   text-align: center;
 }
 
+#index_div {
+  text-align: center;
+}
+
 #main_container {
   display: grid;
   grid-template-rows: repeat(2, 40%);
@@ -31,5 +35,14 @@ textarea {
 #button_div {
   width: 77%;
   margin: auto;
+  text-align: center;
+}
+
+#plan_button {
+  font-size: 1.5rem;
+}
+
+#token_div {
+  border: 10px solid black;
   text-align: center;
 }

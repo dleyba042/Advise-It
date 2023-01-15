@@ -16,7 +16,7 @@ or die("Error Connecting to database");
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Advise-It Tool</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="../Styles/style.css" />
   </head>
   <body>
     <h1>Welcome to the Advise-It Tool</h1>
@@ -66,8 +66,9 @@ or die("Error Connecting to database");
 
     echo
       "
-      <div id='token_div'>
-      <h4> https://dleyba-brown.greenriverdev.com/CapstoneProject/View/?planID=".$token."</h4>
+      <div id='token_div' style = 'border: 10px solid black; text-align:center';>
+      <h4> Link with unique token: 
+      https://dleyba-brown.greenriverdev.com/CapstoneProject/View/?planID=".$token."</h4>
       <div>
       ";
 

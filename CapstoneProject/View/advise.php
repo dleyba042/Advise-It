@@ -74,12 +74,14 @@ or die("Error Connecting to database");
 
     ?>
 
+    <form action="#" method = "post">  
     <div id = "main_container">  
+      
 
       <div class = "textContainer">
 
         <h5>Fall</h5>
-        <textarea>
+        <textarea id = "fall">
         </textarea>  
       
       </div>  
@@ -87,7 +89,7 @@ or die("Error Connecting to database");
       <div class = "textContainer">
 
         <h5>Winter</h5>
-        <textarea>
+        <textarea id = "winter">
         </textarea>  
         
       
@@ -96,7 +98,7 @@ or die("Error Connecting to database");
       <div class = "textContainer">
 
         <h5>Spring</h5>
-        <textarea>
+        <textarea id = "spring">
         </textarea>  
       
       </div>  
@@ -104,7 +106,7 @@ or die("Error Connecting to database");
       <div class = "textContainer">
 
         <h5>Summer</h5>
-        <textarea>
+        <textarea id = "summer">
         </textarea>  
       
       </div>  
@@ -113,7 +115,12 @@ or die("Error Connecting to database");
     <br>
     <br>
     <br>
+    </form>
 
+    <div id = "button_div">
+        <button id="submit_button" type="submit"> SAVE </button>  
+    </div>
+   
     <?php
 
     $lastSavedValue = date_create('now')->format('Y-m-d H:i:s');

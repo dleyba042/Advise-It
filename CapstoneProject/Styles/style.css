@@ -21,3 +21,15 @@ textarea {
   height: 100%;
   margin: auto;
 }
+
+#submit_button {
+  width: 50%;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+#button_div {
+  width: 77%;
+  margin: auto;
+  text-align: center;
+}

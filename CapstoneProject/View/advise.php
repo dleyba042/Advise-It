@@ -69,8 +69,56 @@ or die("Error Connecting to database");
       <div id='token_div' style = 'border: 10px solid black; text-align:center';>
       <h4> Link with unique token: 
       https://dleyba-brown.greenriverdev.com/CapstoneProject/View/?planID=".$token."</h4>
-      <div>
+      </div>
       ";
+
+    ?>
+
+    <div id = "main_container">  
+
+      <div class = "textContainer">
+
+        <h5>Fall</h5>
+        <textarea>
+        </textarea>  
+      
+      </div>  
+
+      <div class = "textContainer">
+
+        <h5>Winter</h5>
+        <textarea>
+        </textarea>  
+        
+      
+      </div>  
+
+      <div class = "textContainer">
+
+        <h5>Spring</h5>
+        <textarea>
+        </textarea>  
+      
+      </div>  
+
+      <div class = "textContainer">
+
+        <h5>Summer</h5>
+        <textarea>
+        </textarea>  
+      
+      </div>  
+
+    </div>
+    <br>
+    <br>
+    <br>
+
+    <?php
+
+    $lastSavedValue = date_create('now')->format('Y-m-d H:i:s');
+
+    echo "<h5 style = 'text-align:center; '> Last saved on $lastSavedValue </h5";
 
     ?>
 

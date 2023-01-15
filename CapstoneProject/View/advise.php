@@ -26,16 +26,41 @@ session_start();
     <h1>Welcome to the Advise-It Tool</h1>
     <?php
 
-    if (!$_SERVER['QUERY_STRING']) {
+    //UPDATE our session variables and then display again
+    if(!empty($_POST))
+    {
+      //Give JS alert message
+      echo "<script src='../JS/advise.js' type='text/javascript'> </script>";
 
-      //WHat we really need to do is
-      $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
-      //Using PDO now so prepare
-      $statement = $cnxn->prepare($sql);
-      //Execute the PDO statement
-      $statement->execute();
+      //Save into the database
+      $fall = $_POST["fall"];
+      $winter = $_POST["winter"];
+      $spring = $_POST["spring"];
+      $summer = $_POST["summer"];
+      $newSaved = date_create('now')->format('Y-m-d H:i:s');
+      $_SESSION["saved"] = $newSaved;
+
+      //I will save here but now I just want to see display updated
+
+      //Update our session variables
+      $_SESSION["fall"] = $fall;
+      $_SESSION["winter"] = $winter;
+      $_SESSION["spring"] = $spring;
+      $_SESSION["summer"] = $summer;
+
+      //Display the updated page
+      include("form_template.php");
+
+
+
+    }
+    else if (!$_SERVER['QUERY_STRING']) 
+    {
 
       //Fetch a list of all the tokens created so far
+      $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
+      $statement = $cnxn->prepare($sql);
+      $statement->execute();
       $existingTokens = $statement->fetchAll((PDO::FETCH_ASSOC));
 
       /*
@@ -71,25 +96,35 @@ session_start();
 
       $_SESSION["token"] = $token;
       $_SESSION["saved"] = $saved;
-
+      $_SESSION["fall"] = "";
+      $_SESSION["winter"] = "";
+      $_SESSION["spring"] = "";
+      $_SESSION["summer"] = "";
      
       include("form_template.php");
   
-
     }
     else
     {
-      ##THIS is where I will display the editable and savable version of any viewed Plan
-      include("form_template.php");
-      echo
-      "
-      <script src='../JS/advise.js' type='text/javascript'> </script>
-      ";
-    }
+
+    
+    //Post is empty and we already know this token so display the data that is stored  
+    //Retrieve all info associated with that particular code
+    //set my session variables here
+
+
+    ##THIS is where I will display the editable and savable version of any viewed Plan
+
+
+        include("form_template.php");
+
+      }
+    
 
     
     ?>
 
+    
 
   </body>
 </html>

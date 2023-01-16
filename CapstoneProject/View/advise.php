@@ -166,17 +166,25 @@ else
   
     }
     else
-    {  
+    {
     //TODO  
     //Post is empty and we already know this token so display the data that is stored  
-    //Retrieve all info associated with that particular code
-    //set my session variables here
-    //Should be failry simple now
-    //Our session token has been set at the top of the code already we just need to retreive and
-    //display the data
-    //the rest of the code should be done by now
-    ##THIS is where I will display the editable and savable version of any viewed Plan
-    include("form_template.php");
+    //Retrieve all info associated with that particular code and then display
+    
+      $selectSQL = "SELECT `fall_quarter`,`winter_quarter`,`spring_quarter`,`summer_quarter`,
+      `last_saved` FROM `StudentPlans` WHERE unique_token = :token ";
+
+      $selectStatement = $cnxn->prepare($selectSQL);
+      $selectStatement->bindParam(":token", $_SESSION["token"]);
+      $selectStatement->execute();
+      $currentData = $selectStatement->fetchAll((PDO::FETCH_ASSOC));
+      $_SESSION["saved"] = $currentData[0]["last_saved"];
+      $_SESSION["fall"] = $currentData[0]["fall_quarter"];
+      $_SESSION["winter"] = $currentData[0]["winter_quarter"];
+      $_SESSION["spring"] = $currentData[0]["spring_quarter"];
+      $_SESSION["summer"] = $currentData[0]["summer_quarter"];
+    
+      include("form_template.php");
 
     }
     

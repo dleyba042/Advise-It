@@ -7,9 +7,52 @@ require("/home/dleybab1/PDOConfig.php");
 $cnxn = new PDO(DB_DSN,DB_USERNAME,DB_PASSWORD)
 or die("Error Connecting to database");
 
-//START A PHP SESSION
-session_start();
+  /*
+  checks the received token against existing tokens for validation
+   */
+  function checkValid($existing, $received)
+  {
+    $good = false;
+      foreach ($existing as $token) 
+      {
+        if ($token['Unique_Token'] == $received) 
+        {
+          $good = true;
+          break;
+        }
+      }
+        return $good;
+  }
 
+//Then We either redirect or display the results
+if($_SERVER['QUERY_STRING'])
+{
+      $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
+      $statement = $cnxn->prepare($sql);
+      $statement->execute();
+      $existingTokens = $statement->fetchAll((PDO::FETCH_ASSOC));
+      //This parses the URL and create an associative array that holds the query string
+      parse_str($_SERVER["QUERY_STRING"], $queryToken);
+
+  if (!checkValid($existingTokens, $queryToken["planID"])) {
+    header('Location: https://dleyba-brown.greenriverdev.com/CapstoneProject/View/');
+  }
+  else
+  {
+    //Start session and set token
+    session_start();
+    date_default_timezone_set("America/Los_Angeles");
+    $_SESSION["token"] =  $queryToken["planID"];
+  }  
+}
+else
+{
+    //Start the session 
+    session_start();
+    date_default_timezone_set("America/Los_Angeles");
+}
+
+//START A PHP SESSION
 ?>
 
 <!DOCTYPE html>
@@ -38,11 +81,24 @@ session_start();
       $spring = $_POST["spring"];
       $summer = $_POST["summer"];
       $newSaved = date_create('now')->format('Y-m-d H:i:s');
-      $_SESSION["saved"] = $newSaved;
+      
 
       //I will save here but now I just want to see display updated
+      $updateSql = "UPDATE `StudentPlans` SET `fall_quarter` = :fall,`winter_quarter`= :winter, 
+      `spring_quarter`= :spring, `summer_quarter` = :summer, `last_saved` = :saved 
+      WHERE `unique_token` = :token "; 
+      
+      $updateStatement = $cnxn->prepare($updateSql);
+      $updateStatement->bindParam(":token", $_SESSION["token"]);
+      $updateStatement->bindParam(":saved", $newSaved);
+      $updateStatement->bindParam(":fall", $fall);
+      $updateStatement->bindParam(":winter", $winter);
+      $updateStatement->bindParam(":spring", $spring);
+      $updateStatement->bindParam(":summer", $summer);
+      $updateStatement->execute();
 
       //Update our session variables
+      $_SESSION["saved"] = $newSaved;
       $_SESSION["fall"] = $fall;
       $_SESSION["winter"] = $winter;
       $_SESSION["spring"] = $spring;
@@ -52,6 +108,11 @@ session_start();
       include("form_template.php");
 
 
+      /*
+      UPDATE `StudentPlans` SET `unique_token`=[value-1],`fall_quarter`=[value-2],`winter_quarter`=[value-3],
+      `spring_quarter`=[value-4],`summer_quarter`=[value-5],`last_saved`=[value-6] WHERE 1
+
+      */
 
     }
     else if (!$_SERVER['QUERY_STRING']) 
@@ -105,20 +166,19 @@ session_start();
   
     }
     else
-    {
-
-    
+    {  
+    //TODO  
     //Post is empty and we already know this token so display the data that is stored  
     //Retrieve all info associated with that particular code
     //set my session variables here
-
-
+    //Should be failry simple now
+    //Our session token has been set at the top of the code already we just need to retreive and
+    //display the data
+    //the rest of the code should be done by now
     ##THIS is where I will display the editable and savable version of any viewed Plan
+    include("form_template.php");
 
-
-        include("form_template.php");
-
-      }
+    }
     
 
     

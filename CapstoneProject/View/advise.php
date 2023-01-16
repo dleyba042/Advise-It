@@ -167,7 +167,6 @@ else
     }
     else
     {
-    //TODO  
     //Post is empty and we already know this token so display the data that is stored  
     //Retrieve all info associated with that particular code and then display
     

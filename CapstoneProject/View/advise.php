@@ -2,57 +2,36 @@
 ##lets connect to our DB right here!!
 ini_set('display_errors',1);
 error_reporting(E_ALL);
+date_default_timezone_set("America/Los_Angeles");
 
-require("/home/dleybab1/PDOConfig.php");
-$cnxn = new PDO(DB_DSN,DB_USERNAME,DB_PASSWORD)
-or die("Error Connecting to database");
+require_once("../Model/Model.php");
 
-  /*
-  checks the received token against existing tokens for validation
-   */
-  function checkValid($existing, $received)
-  {
-    $good = false;
-      foreach ($existing as $token) 
-      {
-        if ($token['Unique_Token'] == $received) 
-        {
-          $good = true;
-          break;
-        }
-      }
-        return $good;
-  }
-
+//Our model will just exist in a class since this is a simple project
+$model = new Model(); 
+  
 //Then We either redirect or display the results
 if($_SERVER['QUERY_STRING'])
 {
-      $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
-      $statement = $cnxn->prepare($sql);
-      $statement->execute();
-      $existingTokens = $statement->fetchAll((PDO::FETCH_ASSOC));
-      //This parses the URL and create an associative array that holds the query string
-      parse_str($_SERVER["QUERY_STRING"], $queryToken);
-
-  if (!checkValid($existingTokens, $queryToken["planID"])) {
+  //This parses the URL and create an associative array that holds the query string
+  parse_str($_SERVER["QUERY_STRING"], $queryToken);
+     
+  if (!$model->checkValid($queryToken["planID"])) 
+  {
     header('Location: https://dleyba-brown.greenriverdev.com/CapstoneProject/View/');
   }
   else
   {
     //Start session and set token
     session_start();
-    date_default_timezone_set("America/Los_Angeles");
     $_SESSION["token"] =  $queryToken["planID"];
   }  
 }
 else
 {
-    //Start the session 
-    session_start();
-    date_default_timezone_set("America/Los_Angeles");
+    //Just Start the session 
+    session_start(); 
 }
 
-//START A PHP SESSION
 ?>
 
 <!DOCTYPE html>
@@ -76,107 +55,42 @@ else
       echo "<script src='../JS/advise.js' type='text/javascript'> </script>";
 
       //Save into the database
-      $fall = $_POST["fall"];
-      $winter = $_POST["winter"];
-      $spring = $_POST["spring"];
-      $summer = $_POST["summer"];
       $newSaved = date_create('now')->format('Y-m-d H:i:s');
-      
-
-      //I will save here but now I just want to see display updated
-      $updateSql = "UPDATE `StudentPlans` SET `fall_quarter` = :fall,`winter_quarter`= :winter, 
-      `spring_quarter`= :spring, `summer_quarter` = :summer, `last_saved` = :saved 
-      WHERE `unique_token` = :token "; 
-      
-      $updateStatement = $cnxn->prepare($updateSql);
-      $updateStatement->bindParam(":token", $_SESSION["token"]);
-      $updateStatement->bindParam(":saved", $newSaved);
-      $updateStatement->bindParam(":fall", $fall);
-      $updateStatement->bindParam(":winter", $winter);
-      $updateStatement->bindParam(":spring", $spring);
-      $updateStatement->bindParam(":summer", $summer);
-      $updateStatement->execute();
+      $model->updateData($_POST["fall"],$_POST["winter"],$_POST["spring"],$_POST["summer"],$newSaved,$_SESSION["token"]);
 
       //Update our session variables
       $_SESSION["saved"] = $newSaved;
-      $_SESSION["fall"] = $fall;
-      $_SESSION["winter"] = $winter;
-      $_SESSION["spring"] = $spring;
-      $_SESSION["summer"] = $summer;
+      $_SESSION["fall"] = $_POST["fall"];
+      $_SESSION["winter"] = $_POST["winter"];
+      $_SESSION["spring"] = $_POST["spring"];
+      $_SESSION["summer"] = $_POST["summer"];
 
       //Display the updated page
       include("form_template.php");
 
-
-      /*
-      UPDATE `StudentPlans` SET `unique_token`=[value-1],`fall_quarter`=[value-2],`winter_quarter`=[value-3],
-      `spring_quarter`=[value-4],`summer_quarter`=[value-5],`last_saved`=[value-6] WHERE 1
-
-      */
-
     }
     else if (!$_SERVER['QUERY_STRING']) 
     {
+      //Create a new plan and identifier
+      $returnData = $model->makeNewPlan();
 
-      //Fetch a list of all the tokens created so far
-      $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
-      $statement = $cnxn->prepare($sql);
-      $statement->execute();
-      $existingTokens = $statement->fetchAll((PDO::FETCH_ASSOC));
-
-      /*
-      generates a unique ID and checks it against the existing ID's.
-      Generates a replacement while the generated ID exists in the database.
-      */
-      function generateUnique($existing)
-      {
-        $generatedtoken = null;
-        $keepGoing = false;
-
-        do {
-          $generatedtoken = uniqid();
-          foreach ($existing as $token) {
-            if ($generatedtoken == $token['Unique_Token']) {
-              $keepGoing = true;
-              break;
-            }
-          }
-        } while ($keepGoing);
-
-        return $generatedtoken;
-      }
-
-      //Stratement to insert the token  
-      $insertSql = "INSERT INTO `StudentPlans`(`unique_token`,`last_saved`) VALUES (:token,:saved)";
-      $saved = date_create('now')->format('Y-m-d H:i:s');
-      $token = generateUnique($existingTokens);
-      $insertStatement = $cnxn->prepare($insertSql);
-      $insertStatement->bindParam(":token", $token);
-      $insertStatement->bindParam(":saved", $saved);
-      $insertStatement->execute();
-
-      $_SESSION["token"] = $token;
-      $_SESSION["saved"] = $saved;
+      $_SESSION["token"] = $returnData["token"];
+      $_SESSION["saved"] = $returnData["saved"];
       $_SESSION["fall"] = "";
       $_SESSION["winter"] = "";
       $_SESSION["spring"] = "";
       $_SESSION["summer"] = "";
      
       include("form_template.php");
-  
+
     }
     else
     {
     //Post is empty and we already know this token so display the data that is stored  
     //Retrieve all info associated with that particular code and then display
     
-      $selectSQL = "SELECT `fall_quarter`,`winter_quarter`,`spring_quarter`,`summer_quarter`,
-      `last_saved` FROM `StudentPlans` WHERE unique_token = :token ";
+      $currentData = $model->retrieveData($_SESSION["token"]);
 
-      $selectStatement = $cnxn->prepare($selectSQL);
-      $selectStatement->bindParam(":token", $_SESSION["token"]);
-      $selectStatement->execute();
-      $currentData = $selectStatement->fetchAll((PDO::FETCH_ASSOC));
       $_SESSION["saved"] = $currentData[0]["last_saved"];
       $_SESSION["fall"] = $currentData[0]["fall_quarter"];
       $_SESSION["winter"] = $currentData[0]["winter_quarter"];
@@ -184,14 +98,9 @@ else
       $_SESSION["summer"] = $currentData[0]["summer_quarter"];
     
       include("form_template.php");
-
     }
     
-
-    
     ?>
-
-    
 
   </body>
 </html>

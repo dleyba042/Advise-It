@@ -19,39 +19,23 @@ $summer = $_SESSION["summer"];
     <div id = "main_container">  
       
       <div class = "textContainer">
-
         <h5>Fall</h5>
-        <textarea id = "fall" name="fall">
-            <?php echo $fall ?>
-        </textarea>  
-      
+        <textarea id = "fall" name="fall"><?php echo $fall?></textarea>   
       </div>  
 
       <div class = "textContainer">
-
         <h5>Winter</h5>
-        <textarea id = "winter" name="winter">
-            <?php echo $winter ?>
-        </textarea>  
-        
+        <textarea id = "winter" name="winter"><?php echo $winter?></textarea>  
       </div>  
 
       <div class = "textContainer">
-
         <h5>Spring</h5>
-        <textarea id = "spring" name="spring">
-            <?php echo $spring ?>
-        </textarea>  
-      
+        <textarea id = "spring" name="spring"><?php echo $spring?></textarea>     
       </div>  
-
-      <div class = "textContainer">
-
-        <h5>Summer</h5>
-        <textarea id = "summer" name="summer">
-            <?php echo $summer ?>
-        </textarea>  
       
+      <div class = "textContainer">
+        <h5>Summer</h5>
+        <textarea id = "summer" name="summer"><?php echo $summer?></textarea>  
       </div>  
 
     </div>

@@ -48,4 +48,4 @@ $summer = $_SESSION["summer"];
         <button id="submit_button" type="submit" form="plan_form"> SAVE </button>  
     </div>
 
-    <h5 style = 'text-align:center;'> Last saved on <?php echo $saved ?></h5>;
+    <h5 style = 'text-align:center;'> Last saved on <?php echo $saved ?></h5>

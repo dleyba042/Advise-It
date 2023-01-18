@@ -56,7 +56,7 @@ else
 
       //Save into the database
       $newSaved = date_create('now')->format('Y-m-d H:i:s');
-      $model->updateData($_POST["fall"],$_POST["winter"],$_POST["spring"],$_POST["summer"],$newSaved,$_SESSION["token"]);
+      $model->updateData( $model->parseData($_POST["fall"]),$_POST["winter"],$_POST["spring"],$_POST["summer"],$newSaved,$_SESSION["token"]);
 
       //Update our session variables
       $_SESSION["saved"] = $newSaved;

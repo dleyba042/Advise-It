@@ -20,6 +20,48 @@ class Model
             echo "Error connecting to Database " . $e->getMessage();
         }
      }
+
+     /**
+      * TEST HELPER METHOD
+      * @param mixed $string
+      * @return string
+      */
+     function parseData($string)
+      {
+
+        if(strlen($string) == 0)
+        {
+          return " ";
+        }
+
+        $newString = "";
+        $len = 0;
+
+        for ($x = 0; $x < strlen($string); $x++) 
+        {
+           if($string[$x] == " ")
+           { 
+              while($string[$x] == " " && $len < 3)
+              {
+                $len++;
+              }
+              if($len >= 3)
+              {
+                $newString.= "\n";             
+                $len = 0;
+              }
+              else
+              {
+                $newString.= $string[$x];
+              }        
+           }
+           else
+           {
+            $newString.= $string[$x]; 
+           }
+        }
+      return $newString;
+      }
     
      /**
       * ensures the token received exists in the database
@@ -92,7 +134,7 @@ class Model
          //I will save here but now I just want to see display updated
       $updateSql = "UPDATE `StudentPlans` SET `fall_quarter` = :fall,`winter_quarter`= :winter, 
       `spring_quarter`= :spring, `summer_quarter` = :summer, `last_saved` = :saved 
-      WHERE `unique_token` = :token "; 
+      WHERE `unique_token` = :token ";
       
       $updateStatement = $this->_dbo->prepare($updateSql);
       $updateStatement->bindParam(":token", $token);
@@ -156,6 +198,8 @@ class Model
 
       return $selectStatement->fetchAll((PDO::FETCH_ASSOC));
       }
+
+      
       
 }
 ?>

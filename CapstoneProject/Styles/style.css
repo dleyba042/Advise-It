@@ -43,6 +43,13 @@ textarea {
 }
 
 #token_div {
-  border: 10px solid black;
+  border: 5px solid black;
   text-align: center;
+  width: 75%;
+  margin: auto;
+}
+
+.header_footer {
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.8);
 }

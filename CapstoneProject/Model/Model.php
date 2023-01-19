@@ -129,11 +129,11 @@ class Model
         * @return void
         */
 
-      function updateData($fall,$winter,$spring,$summer,$newSaved,$token)
+      function updateData($fall,$winter,$spring,$summer,$newSaved,$token,$advisor)
       {
          //I will save here but now I just want to see display updated
       $updateSql = "UPDATE `StudentPlans` SET `fall_quarter` = :fall,`winter_quarter`= :winter, 
-      `spring_quarter`= :spring, `summer_quarter` = :summer, `last_saved` = :saved 
+      `spring_quarter`= :spring, `summer_quarter` = :summer, `last_saved` = :saved, `advisor` = :advisor 
       WHERE `unique_token` = :token ";
       
       $updateStatement = $this->_dbo->prepare($updateSql);
@@ -143,6 +143,7 @@ class Model
       $updateStatement->bindParam(":winter", $winter);
       $updateStatement->bindParam(":spring", $spring);
       $updateStatement->bindParam(":summer", $summer);
+      $updateStatement->bindParam(":advisor", $advisor);
       $updateStatement->execute();
 
       }
@@ -190,7 +191,7 @@ class Model
       function retrieveData($token)
       {
         $selectSQL = "SELECT `fall_quarter`,`winter_quarter`,`spring_quarter`,`summer_quarter`,
-      `last_saved` FROM `StudentPlans` WHERE unique_token = :token ";
+      `last_saved`, `advisor` FROM `StudentPlans` WHERE unique_token = :token ";
 
       $selectStatement = $this->_dbo->prepare($selectSQL);
       $selectStatement->bindParam(":token", $token);

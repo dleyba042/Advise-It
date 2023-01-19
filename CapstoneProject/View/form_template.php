@@ -8,8 +8,13 @@ $fall = $_SESSION["fall"];
 $winter = $_SESSION["winter"];
 $spring = $_SESSION["spring"];
 $summer = $_SESSION["summer"];
+$advisor = $_SESSION["advisor"];
 
 ?>
+
+<div class= "header_footer">
+   <h1>Welcome to the Advise-It Tool</h1>
+</div>
 
 <div id='token_div'>
       <h4> <?php echo "Link to view and edit: ". $token ?></h4>
@@ -42,10 +47,14 @@ $summer = $_SESSION["summer"];
     <br>
     <br>
     <br>
-    </form>
+    
 
     <div id = "button_div">
         <button id="submit_button" type="submit" form="plan_form"> SAVE </button>  
     </div>
 
-    <h5 style = 'text-align:center;'> Last saved on <?php echo $saved ?></h5>
+    <div id= "bottom_div" class="header_footer">
+      <h5> Advisor: <input type = "text" name = "advisor" value ="<?php echo htmlspecialchars($advisor)?>"></h5>
+      <h5 > Last saved on <?php echo $saved ?></h5>
+    </div>
+    </form>

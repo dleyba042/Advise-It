@@ -45,7 +45,6 @@ else
   </head>
   <body>
 
-    <h1>Welcome to the Advise-It Tool</h1>
     <?php
 
     //UPDATE our session variables and then display again
@@ -56,7 +55,8 @@ else
 
       //Save into the database
       $newSaved = date_create('now')->format('Y-m-d H:i:s');
-      $model->updateData( $model->parseData($_POST["fall"]),$_POST["winter"],$_POST["spring"],$_POST["summer"],$newSaved,$_SESSION["token"]);
+      $model->updateData( $model->parseData($_POST["fall"]),$_POST["winter"],$_POST["spring"],$_POST["summer"],$newSaved,$_SESSION["token"]
+      ,$_POST["advisor"]);
 
       //Update our session variables
       $_SESSION["saved"] = $newSaved;
@@ -64,6 +64,7 @@ else
       $_SESSION["winter"] = $_POST["winter"];
       $_SESSION["spring"] = $_POST["spring"];
       $_SESSION["summer"] = $_POST["summer"];
+      $_SESSION["advisor"] = $_POST["advisor"];
 
       //Display the updated page
       include("form_template.php");
@@ -80,6 +81,7 @@ else
       $_SESSION["winter"] = "";
       $_SESSION["spring"] = "";
       $_SESSION["summer"] = "";
+      $_SESSION["advisor"] = "";
      
       include("form_template.php");
 
@@ -96,6 +98,7 @@ else
       $_SESSION["winter"] = $currentData[0]["winter_quarter"];
       $_SESSION["spring"] = $currentData[0]["spring_quarter"];
       $_SESSION["summer"] = $currentData[0]["summer_quarter"];
+      $_SESSION["advisor"] = $currentData[0]["advisor"];
     
       include("form_template.php");
     }

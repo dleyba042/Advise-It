@@ -1,24 +1,42 @@
 const adminButton = document.getElementById("admin_button");
 const loginButton = document.getElementById("login_button");
-const hiddenDiv = document.getElementById("entry_div");
 const username = document.getElementById("user_name");
 const password = document.getElementById("password");
+const passWarning = document.getElementById("pass_warning");
+const userWarning = document.getElementById("user_warning");
+const hiddenDiv = document.getElementById("hidden_div");
 
 adminButton.addEventListener("click", () => {
-  if (hiddenDiv.style.display == "none") {
-    hiddenDiv.style.display = "grid";
+  console.log("clicked");
+
+  if (hiddenDiv.classList.contains("hidden")) {
+    console.log("yep");
+    hiddenDiv.classList.remove("hidden");
+    hiddenDiv.classList.add("shown");
   } else {
-    hiddenDiv.style.display = "none";
+    //  console.log("what?");
+    hiddenDiv.classList.remove("shown");
+    hiddenDiv.classList.add("hidden");
   }
 });
 
 loginButton.addEventListener("click", () => {
   if (username.value == "admin" && password.value == "@dm1n") {
-    console.log("Redirect here");
     //Todo use window.location = ""
-    window.location = "https://www.msn.com/en-us";
+    //window.location = "MY_URL.ADMIN";
   } else {
     //TODO add those hiddent elements in html
-    console.log("display errors on page");
+    showError(user_warning);
+    showError(pass_warning);
   }
 });
+
+const showError = (elem) => {
+  elem.classList.remove("hidden");
+  elem.classList.add("error");
+};
+
+const removeError = (elem) => {
+  elem.classList.add("hidden");
+  elem.classList.remove("error");
+};

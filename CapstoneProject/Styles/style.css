@@ -29,14 +29,17 @@ textarea {
   margin: auto;
 }
 
-#submit_button {
+.plan_button {
   width: 50%;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  padding: 0.2rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
 }
 
 #button_div {
-  width: 77%;
+  width: 30%;
   margin: auto;
   text-align: center;
 }

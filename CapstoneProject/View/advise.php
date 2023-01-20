@@ -49,9 +49,6 @@ else
     //UPDATE our session variables and then display again
     if(!empty($_POST))
     {
-      //Give JS alert message
-      echo "<script src='../JS/advise.js' type='text/javascript'> </script>";
-
       //Save into the database
       $newSaved = date_create('now')->format('Y-m-d H:i:s');
       $model->updateData( $model->parseData($_POST["fall"]),$_POST["winter"],$_POST["spring"],$_POST["summer"],$newSaved,$_SESSION["token"]
@@ -103,6 +100,8 @@ else
     }
     
     ?>
+
+ <script src='../JS/advise.js' type='text/javascript'> </script>
 
   </body>
 </html>

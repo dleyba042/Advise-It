@@ -50,7 +50,8 @@ $advisor = $_SESSION["advisor"];
     
 
     <div id = "button_div">
-        <button id="submit_button" type="submit" form="plan_form"> SAVE </button>  
+        <button class = "plan_button" id="submit_button" type="submit" form="plan_form"> SAVE </button>  
+        <button class = "plan_button" id = "print_button" type="button"> PRINT </button>
     </div>
 
     <div id= "bottom_div" class="header_footer">

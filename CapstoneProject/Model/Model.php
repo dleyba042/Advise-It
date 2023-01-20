@@ -200,6 +200,23 @@ class Model
       return $selectStatement->fetchAll((PDO::FETCH_ASSOC));
       }
 
+      /**
+        * Retrieves all data currently stored in the database
+        * @param mixed $token
+        * @return array
+        */
+
+        function retrieveAllData()
+        {
+          $selectSQL = "SELECT * FROM `StudentPlans`";
+  
+          $selectStatement = $this->_dbo->prepare($selectSQL);
+          $selectStatement->execute();
+
+        return $selectStatement->fetchAll((PDO::FETCH_ASSOC));
+
+        }
+
       
       
 }

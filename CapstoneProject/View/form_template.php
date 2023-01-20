@@ -13,7 +13,7 @@ $advisor = $_SESSION["advisor"];
 ?>
 
 <div class= "header_footer">
-   <h1>Welcome to the Advise-It Tool</h1>
+   <h1>Advise-It Tool</h1>
 </div>
 
 <div id='token_div'>

@@ -22,12 +22,13 @@ adminButton.addEventListener("click", () => {
 
 loginButton.addEventListener("click", () => {
   if (username.value == "admin" && password.value == "@dm1n") {
-    //Todo use window.location = ""
-    //window.location = "MY_URL.ADMIN";
+    removeError(userWarning);
+    removeError(passWarning);
+    window.location = "admin.php";
   } else {
     //TODO add those hiddent elements in html
-    showError(user_warning);
-    showError(pass_warning);
+    showError(userWarning);
+    showError(passWarning);
   }
 });
 

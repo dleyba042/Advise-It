@@ -76,3 +76,33 @@ textarea {
 label {
   display: block;
 }
+
+.dataTables_wrapper {
+  background-color: rgba(155, 136, 42, 0.4);
+}
+
+#myTable_wrapper {
+  text-align: center;
+}
+
+#myTable_length,
+#myTable_filter {
+  color: white;
+  background-color: brown;
+}
+
+#myTable_paginate,
+#myTable_info {
+  background-color: white;
+  padding: 1rem;
+}
+
+#myTable_previous,
+#myTable_next {
+  background-color: brown;
+  padding: 0.5rem;
+  margin: 2rem;
+  border-radius: 7px;
+  border: 2px solid black;
+  color: white;
+}

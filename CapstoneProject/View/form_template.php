@@ -13,11 +13,11 @@ $advisor = $_SESSION["advisor"];
 ?>
 
 <div class= "header_footer">
-   <h1>Advise-It Tool</h1>
+   <h1>Student Plan</h1>
 </div>
 
 <div id='token_div'>
-      <h4> <?php echo "Link to view and edit: ". $token ?></h4>
+      <h4> <?php echo "Link to view and edit: <a href = ' ". $token."'>". $token."</a>" ?></h4>
       </div>
 
 <form action="#" id="plan_form" method = "post">  

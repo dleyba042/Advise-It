@@ -1,3 +1,5 @@
+/* Elements */
+
 html {
   background-color: beige;
 }
@@ -5,6 +7,18 @@ html {
 h1 {
   text-align: center;
 }
+
+label {
+  display: block;
+}
+
+textarea {
+  width: 100%;
+  height: 100%;
+  margin: auto;
+}
+
+/* ID's */
 
 #index_div {
   margin: 25%;
@@ -23,32 +37,10 @@ h1 {
   grid-template-columns: repeat(2, 40%);
 }
 
-textarea {
-  width: 100%;
-  height: 100%;
-  margin: auto;
-}
-
-.plan_button {
-  width: 50%;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  padding: 0.2rem;
-  border-radius: 10px;
-  font-size: 0.8rem;
-}
-
 #button_div {
   width: 30%;
   margin: auto;
   text-align: center;
-}
-
-.index_button {
-  display: block;
-  margin: 1.5rem auto;
-  font-size: 1.5rem;
-  border-radius: 7px;
 }
 
 #token_div {
@@ -56,32 +48,6 @@ textarea {
   text-align: center;
   width: 75%;
   margin: auto;
-}
-
-.header_footer {
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.8);
-}
-
-.hidden {
-  display: none;
-}
-
-.shown {
-  display: block;
-}
-
-.error {
-  color: red;
-  display: block;
-}
-
-label {
-  display: block;
-}
-
-.dataTables_wrapper {
-  background-color: rgba(155, 136, 42, 0.4);
 }
 
 #myTable_wrapper {
@@ -108,4 +74,52 @@ label {
   border-radius: 7px;
   border: 2px solid black;
   color: white;
+}
+
+/* Classes */
+
+.plan_button {
+  width: 50%;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  padding: 0.2rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+
+.index_button {
+  display: block;
+  margin: 1.5rem auto;
+  font-size: 1.5rem;
+  border-radius: 7px;
+}
+
+.header_footer {
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.hidden {
+  display: none;
+}
+
+.shown {
+  display: block;
+}
+
+.error {
+  color: red;
+  display: block;
+}
+
+.dataTables_wrapper {
+  background-color: rgba(155, 136, 42, 0.4);
+}
+
+/* Responsive */
+
+@media print {
+  #button_div {
+    display: none;
+  }
 }

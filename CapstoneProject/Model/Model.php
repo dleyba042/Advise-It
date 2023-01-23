@@ -23,17 +23,16 @@ class Model
 
      /**
       * TEST HELPER METHOD
+      * works to parse the newline into strings
       * @param mixed $string
       * @return string
       */
      function parseData($string)
       {
-
         if(strlen($string) == 0)
         {
           return " ";
         }
-
         $newString = "";
         $len = 0;
 
@@ -41,14 +40,18 @@ class Model
         {
            if($string[$x] == " ")
            { 
-              while($string[$x] == " " && $len < 3)
+              while($string[$x] == " " && $len < 1)
               {
                 $len++;
               }
-              if($len >= 3)
+              if($len >= 2)
               {
                 $newString.= "\n";             
                 $len = 0;
+                while($string[$x] == " " && $len < 2)
+                {
+                  $x++;
+                }
               }
               else
               {
@@ -131,6 +134,7 @@ class Model
 
       function updateData($fall,$winter,$spring,$summer,$newSaved,$token,$advisor)
       {
+
          //I will save here but now I just want to see display updated
       $updateSql = "UPDATE `StudentPlans` SET `fall_quarter` = :fall,`winter_quarter`= :winter, 
       `spring_quarter`= :spring, `summer_quarter` = :summer, `last_saved` = :saved, `advisor` = :advisor 

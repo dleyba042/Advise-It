@@ -22,51 +22,6 @@ class Model
      }
 
      /**
-      * TEST HELPER METHOD
-      * works to parse the newline into strings
-      * @param mixed $string
-      * @return string
-      */
-     function parseData($string)
-      {
-        if(strlen($string) == 0)
-        {
-          return " ";
-        }
-        $newString = "";
-        $len = 0;
-
-        for ($x = 0; $x < strlen($string); $x++) 
-        {
-           if($string[$x] == " ")
-           { 
-              while($string[$x] == " " && $len < 1)
-              {
-                $len++;
-              }
-              if($len >= 2)
-              {
-                $newString.= "\n";             
-                $len = 0;
-                while($string[$x] == " " && $len < 2)
-                {
-                  $x++;
-                }
-              }
-              else
-              {
-                $newString.= $string[$x];
-              }        
-           }
-           else
-           {
-            $newString.= $string[$x]; 
-           }
-        }
-      return $newString;
-      }
-    
-     /**
       * ensures the token received exists in the database
       * @param mixed $received
       * @return bool
@@ -153,36 +108,24 @@ class Model
       }
 
       /**
-       * Generates a new token and creates a DB entry for that token and the initial save.
-       * This information is then returned so it can be displayed.
-       * @return array<string>
+       * creates a DB entry for the passed token and the initial save time.
+       * This save time is then returned to be displayed.
+       * @return string of datetime
        */
-      function makeNewPlan()
+      function makeNewPlan($token)
       {
-        //Fetch a list of all the tokens created so far
-      $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
-      $statement = $this->_dbo->prepare($sql);
-      $statement->execute();
-      $existingTokens = $statement->fetchAll((PDO::FETCH_ASSOC));
       
-      //Stratement to insert the token  
+      //Statement to insert the token  
       $insertSql = "INSERT INTO `StudentPlans`(`unique_token`,`last_saved`) VALUES (:token,:saved)";
       $saved = date_create('now')->format('Y-m-d H:i:s');
-
-      //Generate a Unique ID using Model Object
-      $token = $this->generateUnique($existingTokens);
 
       $insertStatement = $this->_dbo->prepare($insertSql);
       $insertStatement->bindParam(":token", $token);
       $insertStatement->bindParam(":saved", $saved);
       $insertStatement->execute();
 
-      $returnArray = array();
 
-      $returnArray["token"] = $token;
-      $returnArray["saved"] = $saved;
-
-      return $returnArray;  
+      return $saved;  
 
       }
 
@@ -220,8 +163,19 @@ class Model
         return $selectStatement->fetchAll((PDO::FETCH_ASSOC));
 
         }
+       
+     /**
+      * retrieves an array of all existing tokens in db so as not to duplicate
+      * @return array
+      */
 
-      
+    function getExistingTokens()
+    {
+      $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
+      $statement = $this->_dbo->prepare($sql);
+      $statement->execute();
+      return $statement->fetchAll((PDO::FETCH_ASSOC));
+    } 
       
 }
 ?>

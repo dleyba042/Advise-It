@@ -9,10 +9,22 @@
   </head>
   <body>
     
+<?php 
+ini_set('display_errors',1);
+error_reporting(E_ALL);
+date_default_timezone_set("America/Los_Angeles");
+
+require_once("../Model/Model.php");
+
+//Our model will just exist in a class since this is a simple project
+$model = new Model(); 
+
+?>
       <div id="index_div">
-        <form action="advise.php" method="get">
+        <form action="advise.php?planID=<?php echo $model->generateUnique($model->getExistingTokens()) ?>" method="post">
           <h1>Welcome to the Advise-It Tool</h1>
           <button id="plan_button" class= "index_button" type="submit">Create Plan</button>
+          <input type="text" style="display: none;" name="new" value = "true">
         </form>   
         <button id="admin_button" class = "index_button" >Admin Login</button>
         <div id = "hidden_div" class="hidden">

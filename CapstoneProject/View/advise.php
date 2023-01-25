@@ -9,27 +9,21 @@ require_once("../Model/Model.php");
 $model = new Model(); 
   
 //Then We either redirect or display the results
-if($_SERVER['QUERY_STRING'])
-{
+
   //This parses the URL and create an associative array that holds the query string
   parse_str($_SERVER["QUERY_STRING"], $queryToken);
-     
-  if (!$model->checkValid($queryToken["planID"])) 
+
+  if (empty($_POST) && !$model->checkValid($queryToken["planID"])) 
   {
     header('Location: https://dleyba-brown.greenriverdev.com/CapstoneProject/View/');
   }
-  else
-  {
+ // else
+ // {
     //Start session and set token
     session_start();
     $_SESSION["token"] =  $queryToken["planID"];
-  }  
-}
-else
-{
-    //Just Start the session 
-    session_start(); 
-}
+ // }  
+
 
 ?>
 
@@ -46,33 +40,11 @@ else
 
     <?php
 
-    //UPDATE our session variables and then display again
-    if(!empty($_POST))
+    //New plan then
+    if(array_key_exists("new",$_POST))
     {
-      //Save into the database
-      $newSaved = date_create('now')->format('Y-m-d H:i:s');
-      $model->updateData($_POST["fall"],$_POST["winter"],$_POST["spring"],$_POST["summer"],$newSaved,$_SESSION["token"]
-      ,$_POST["advisor"]);
 
-      //Update our session variables
-      $_SESSION["saved"] = $newSaved;
-      $_SESSION["fall"] = $_POST["fall"];
-      $_SESSION["winter"] = $_POST["winter"];
-      $_SESSION["spring"] = $_POST["spring"];
-      $_SESSION["summer"] = $_POST["summer"];
-      $_SESSION["advisor"] = $_POST["advisor"];
-
-      //Display the updated page
-      include("form_template.php");
-
-    }
-    else if (!$_SERVER['QUERY_STRING']) 
-    {
-      //Create a new plan and identifier
-      $returnData = $model->makeNewPlan();
-
-      $_SESSION["token"] = $returnData["token"];
-      $_SESSION["saved"] = $returnData["saved"];
+      $_SESSION["saved"] = $model->makeNewPlan($_SESSION["token"]);
       $_SESSION["fall"] = "";
       $_SESSION["winter"] = "";
       $_SESSION["spring"] = "";
@@ -81,24 +53,49 @@ else
      
       include("form_template.php");
 
-    }
+    }  
     else
     {
-    //Post is empty and we already know this token so display the data that is stored  
-    //Retrieve all info associated with that particular code and then display
-    
-      $currentData = $model->retrieveData($_SESSION["token"]);
+      //retrieve data
+      if(empty($_POST))
+      {
 
-      $_SESSION["saved"] = $currentData[0]["last_saved"];
-      $_SESSION["fall"] = $currentData[0]["fall_quarter"];
-      $_SESSION["winter"] = $currentData[0]["winter_quarter"];
-      $_SESSION["spring"] = $currentData[0]["spring_quarter"];
-      $_SESSION["summer"] = $currentData[0]["summer_quarter"];
-      $_SESSION["advisor"] = $currentData[0]["advisor"];
-    
-      include("form_template.php");
+        $currentData = $model->retrieveData($_SESSION["token"]);
+
+        $_SESSION["saved"] = $currentData[0]["last_saved"];
+        $_SESSION["fall"] = $currentData[0]["fall_quarter"];
+        $_SESSION["winter"] = $currentData[0]["winter_quarter"];
+        $_SESSION["spring"] = $currentData[0]["spring_quarter"];
+        $_SESSION["summer"] = $currentData[0]["summer_quarter"];
+        $_SESSION["advisor"] = $currentData[0]["advisor"];
+
+        include("form_template.php");
+
+      }
+      //then its a new save
+      else
+      {
+        //Save into the database
+        $newSaved = date_create('now')->format('Y-m-d H:i:s');
+        $model->updateData($_POST["fall"],$_POST["winter"],$_POST["spring"],$_POST["summer"],$newSaved,$_SESSION["token"]
+        ,$_POST["advisor"]);
+
+        //Update our session variables
+        $_SESSION["saved"] = $newSaved;
+        $_SESSION["fall"] = $_POST["fall"];
+        $_SESSION["winter"] = $_POST["winter"];
+        $_SESSION["spring"] = $_POST["spring"];
+        $_SESSION["summer"] = $_POST["summer"];
+        $_SESSION["advisor"] = $_POST["advisor"];
+
+        //Display the updated page
+        include("form_template.php");
+
+      }
+
     }
-    
+
+      
     ?>
 
  <script src='../JS/advise.js' type='text/javascript'> </script>

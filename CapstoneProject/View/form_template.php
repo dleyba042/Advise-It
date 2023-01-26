@@ -9,29 +9,31 @@ $winter = $_SESSION["winter"];
 $spring = $_SESSION["spring"];
 $summer = $_SESSION["summer"];
 $advisor = $_SESSION["advisor"];
+$year = $_SESSION["school_year"];
+$yearNum = $_SESSION["year_num"];
 
 ?>
 
     <div class = "plan_container">  
       
       <div class = "textContainer">
-        <h5>Fall</h5>
-        <textarea id = "fall" name="fall"><?php echo $fall?></textarea>   
+        <h5>Fall <?php echo $year?></h5>
+        <textarea id = "fall" name="fall_<?php echo $yearNum?>"><?php echo $fall?></textarea>   
       </div>  
 
       <div class = "textContainer">
-        <h5>Winter</h5>
-        <textarea id = "winter" name="winter"><?php echo $winter?></textarea>  
+        <h5>Winter  <?php echo ($year + 1)?></h5>
+        <textarea id = "winter" name="winter_<?php echo $yearNum?>"><?php echo $winter?></textarea>  
       </div>  
 
       <div class = "textContainer">
-        <h5>Spring</h5>
-        <textarea id = "spring" name="spring"><?php echo $spring?></textarea>     
+        <h5>Spring  <?php echo ($year + 1)?></h5>
+        <textarea id = "spring" name="spring_<?php echo $yearNum?>"><?php echo $spring?></textarea>     
       </div>  
       
       <div class = "textContainer">
-        <h5>Summer</h5>
-        <textarea id = "summer" name="summer"><?php echo $summer?></textarea>  
+        <h5>Summer  <?php echo ($year + 1)?></h5>
+        <textarea id = "summe" name="summer_<?php echo $yearNum?>"><?php echo $summer?></textarea>  
       </div>  
 
     </div>

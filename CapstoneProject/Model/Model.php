@@ -75,6 +75,14 @@ class Model
         return $generatedtoken;
       }
 
+
+      /**
+       * 
+       *
+       * @param mixed $token
+       * @param mixed $yearNum
+       * @return int|string the shcool year that this plan was created
+       */
       function initPLanDB($token, $yearNum)
       {
 
@@ -83,9 +91,9 @@ class Model
 
         $schoolYear = date("Y");
         $month = date("m");
-        if($month >= 7) 
+        if($month <= 7) 
         {
-          $schoolYear++;
+          $schoolYear--;
         }
 
         $insertStatement = $this->_dbo->prepare($insertSql);
@@ -93,6 +101,9 @@ class Model
         $insertStatement->bindParam(":yearNum", $yearNum);  
         $insertStatement->bindParam(":schoolYear", $schoolYear);                 
         $insertStatement->execute();
+
+        return $schoolYear;
+    
       }
 
       function updatePlanTable($year,$fall,$winter,$spring,$summer,$token)
@@ -155,6 +166,42 @@ class Model
       }
 
 
+      function determinePlanCount($token)
+      {
+        $count = "SELECT Count(*)FROM `Plan_Info` WHERE `token` = :token";
+        $statement = $this->_dbo->prepare($count);
+        $statement->bindParam(":token", $token);
+        $statement->execute();
+        return $statement->fetchAll();
+      }
+
+      function determineStartAndEndYear($token)
+      {
+        $sql = "SELECT `next_previous_year` AS `oldest`, `next_future_year` AS `newest` FROM `Token_Info` WHERE `token` = :token ";
+        $statement = $this->_dbo->prepare($sql);
+        $statement->bindParam(":token", $token);
+        $statement->execute();
+        $years =  $statement->fetchAll(PDO::FETCH_ASSOC);
+    
+        //THESE NEED TO BE ADJUSTED AS THEY HOLD THE PLACE OF NEXT VALID YEAR NOT A YEAR THAT CURRENTLY EXISTS
+        $years[0]["oldest"]++; 
+        $years[0]["newest"]--;
+
+        return $years;
+      }
+
+      function getSchoolYear($token,$yearNum)
+      {
+          $sql = "SELECT `school_year` FROM `Plan_Info` 
+          WHERE `token`  = :token AND `year_num` = :yearNum ";
+          $statement = $this->_dbo->prepare($sql);
+          $statement->bindParam(":token", $token);
+          $statement->bindParam(":yearNum", $yearNum);
+          $statement->execute();
+          return  $statement->fetchAll(PDO::FETCH_ASSOC);        
+      }
+
+
        /**
         * get every plan associated with this token in sorted order by plan number
         * @param mixed $token
@@ -163,7 +210,7 @@ class Model
 
       function retreivePlansInOrder($token)
       {
-        $selectSQL = "SELECT `fall`,`winter`,`spring`,`summer`, `school_year` FROM `Plan_Info` 
+        $selectSQL = "SELECT `fall`,`winter`,`spring`,`summer`, `school_year`, `year_num` FROM `Plan_Info` 
         WHERE token = :token
         ORDER BY `year_num`";
         $selectStatement = $this->_dbo->prepare($selectSQL);
@@ -194,7 +241,7 @@ class Model
 
 
 
-      //TODO fix this to show all plans from the plan DB
+      //
       /**
         * Retrieves all data currently stored in the database
         * @param mixed $token

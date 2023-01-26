@@ -75,15 +75,23 @@ class Model
         return $generatedtoken;
       }
 
-      function initPLanDB($token, $year)
+      function initPLanDB($token, $yearNum)
       {
 
-        $insertSql = "INSERT INTO `Plan_Info`(`year_num`,`token`) 
-                  VALUES (:year, :token)";
+        $insertSql = "INSERT INTO `Plan_Info`(`year_num`,`token`,`school_year`) 
+                  VALUES (:yearNum, :token, :schoolYear)";
+
+        $schoolYear = date("Y");
+        $month = date("m");
+        if($month >= 7) 
+        {
+          $schoolYear++;
+        }
 
         $insertStatement = $this->_dbo->prepare($insertSql);
         $insertStatement->bindParam(":token", $token);
-        $insertStatement->bindParam(":year", $year);              
+        $insertStatement->bindParam(":yearNum", $yearNum);  
+        $insertStatement->bindParam(":schoolYear", $schoolYear);                 
         $insertStatement->execute();
       }
 
@@ -155,7 +163,7 @@ class Model
 
       function retreivePlansInOrder($token)
       {
-        $selectSQL = "SELECT `fall`,`winter`,`spring`,`summer`, `year_num` FROM `Plan_Info` 
+        $selectSQL = "SELECT `fall`,`winter`,`spring`,`summer`, `school_year` FROM `Plan_Info` 
         WHERE token = :token
         ORDER BY `year_num`";
         $selectStatement = $this->_dbo->prepare($selectSQL);

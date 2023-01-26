@@ -6,6 +6,11 @@ html {
 
 h1 {
   text-align: center;
+  margin: 0;
+}
+
+h5 {
+  margin: 0;
 }
 
 label {
@@ -27,16 +32,6 @@ textarea {
   padding: 1rem;
 }
 
-#main_container {
-  display: grid;
-  grid-template-rows: repeat(2, 40%);
-  grid-gap: 5rem;
-  margin: auto;
-  width: 60%;
-  height: 60vh;
-  grid-template-columns: repeat(2, 40%);
-}
-
 #button_div {
   width: 30%;
   margin: auto;
@@ -44,7 +39,6 @@ textarea {
 }
 
 #token_div {
-  border: 5px solid black;
   text-align: center;
   width: 75%;
   margin: auto;
@@ -85,6 +79,17 @@ textarea {
   padding: 0.2rem;
   border-radius: 10px;
   font-size: 0.8rem;
+}
+
+.plan_container {
+  border: 5px solid black;
+  padding: 3rem;
+  display: grid;
+  grid-gap: 5rem;
+  margin: auto;
+  width: 50%;
+  height: 60vh;
+  grid-template-columns: auto auto;
 }
 
 .index_button {

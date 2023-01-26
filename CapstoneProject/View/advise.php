@@ -26,8 +26,9 @@ define("YEAR_STARTER",100);
   {
     session_start();
   }
-  $_SESSION["token"] =  $queryToken["planID"];
 
+  $_SESSION["token"] =  $queryToken["planID"];
+  $displayToken = "https://dleyba-brown.greenriverdev.com/CapstoneProject/View/advise.php?planID=". $_SESSION["token"];
 ?>
 
 <!DOCTYPE html>
@@ -40,6 +41,17 @@ define("YEAR_STARTER",100);
     <link rel="stylesheet" href="../Styles/style.css" />
   </head>
   <body>
+
+  <form action="#" id="plan_form" method = "post">  
+
+  <div class= "header_footer">
+    <h1>Student Plans</h1>
+  </div>
+  
+  <div id='token_div'>
+      <h4> <?php echo "Link to view and edit plans: <a href = ' ". $displayToken."'>". $displayToken."</a>" ?></h4>
+  </div>
+
 
     <?php
 
@@ -65,7 +77,9 @@ define("YEAR_STARTER",100);
         $_SESSION["summer"] = "";
         $_SESSION["advisor"] = "";
 
+      
         include("form_template.php");
+
       }
 
     }  
@@ -75,23 +89,49 @@ define("YEAR_STARTER",100);
       if(empty($_POST))
       {
 
-        $plans = $model->retreivePlansInOrder($_SESSION["token"]);
-        $_SESSION["fall"] = $plans[0]["fall"];
-        $_SESSION["winter"] = $plans[0]["winter"];
-        $_SESSION["spring"] = $plans[0]["spring"];
-        $_SESSION["summer"] = $plans[0]["summer"];
-
         $otherInfo = $model->retreiveAdvisorAndTime($_SESSION["token"]);
         $_SESSION["saved"] = $otherInfo[0]["last_saved"];
         $_SESSION["advisor"] = $otherInfo[0]["advisor"];
 
-        include("form_template.php");
+        $plans = $model->retreivePlansInOrder($_SESSION["token"]);
+
+
+        //TODO test on retreival  
+         //How bout we say
+        //for every year we have 
+        //update the variables and set the id's for the php properly
+        //then add a from template and use those variables for each one we update
+
+
+        //INSERT INTO `Plan_Info`(`fall`, `winter`, `spring`, `summer`, `year_num`, `token`) VALUES ("fall","rwg","fawrgwr","frwgwrl",99,"63d2cacd79f01")
+
+
+        // FOR TESTING ->  63d2cacd79f01
+
+        //for each plan in order
+        //update my variables and put them in session
+        //then add to the form template
+    
+        for ($i = 0; $i < count($plans); $i++)
+        {
+          $_SESSION["fall"] = $plans[$i]["fall"];
+          $_SESSION["winter"] = $plans[$i]["winter"];
+          $_SESSION["spring"] = $plans[$i]["spring"];
+          $_SESSION["summer"] = $plans[$i]["summer"];
+          $_SESSION["school_year"] = $plans[$i]["school_year"];
+
+          echo "<h1> " . $plans[$i]["school_year"] . "</h1>";
+          include("form_template.php");
+        }
+      
 
       }
       //then its a new save
       else
       {
-    
+
+        echo "SSHOULD UPDATE";
+
         //Save into the database
         $newSaved = date_create('now')->format('Y-m-d H:i:s');
         //100 is 
@@ -113,12 +153,20 @@ define("YEAR_STARTER",100);
         include("form_template.php");
 
       }
-
     }
-
-      
     ?>
 
+    <div id = "button_div">
+      <button class = "plan_button" id="submit_button" type="submit" form="plan_form"> SAVE </button>  
+      <button class = "plan_button" id = "print_button" type="button"> PRINT </button>
+    </div>
+
+    <div id= "bottom_div" class="header_footer">
+      <h5> Advisor: <input type = "text" name = "advisor" value ="<?php echo htmlspecialchars($advisor)?>"></h5>
+      <h5 > Last saved on <?php echo $saved ?></h5>
+    </div>
+
+  </form>
  <script src='../JS/advise.js' type='text/javascript'> </script>
 
   </body>

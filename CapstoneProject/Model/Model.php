@@ -30,7 +30,7 @@ class Model
         function checkValid($received)
         {
 
-            $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
+            $sql = "SELECT `token` FROM `Token_Info`";
             $statement = $this->_dbo->prepare($sql);
             $statement->execute();
             $existing = $statement->fetchAll((PDO::FETCH_ASSOC));
@@ -38,7 +38,7 @@ class Model
             $good = false;
             foreach ($existing as $token) 
             {
-                if ($token['Unique_Token'] == $received) 
+                if ($token['token'] == $received) 
                 {
                 $good = true;
                 break;
@@ -64,7 +64,7 @@ class Model
           $generatedtoken = uniqid();
           foreach ($existing as $token) 
           {
-            if ($generatedtoken == $token['Unique_Token']) 
+            if ($generatedtoken == $token['token']) 
             {
               $keepGoing = true;
               break;
@@ -75,78 +75,118 @@ class Model
         return $generatedtoken;
       }
 
-       /**
-        * Updates the user data for the assoiated token
-        * receives the textarea entries the new save time anb the token as parameters
-        * @param mixed $fall
-        * @param mixed $winter
-        * @param mixed $spring
-        * @param mixed $summer
-        * @param mixed $newSaved
-        * @param mixed $token
-        * @return void
-        */
-
-      function updateData($fall,$winter,$spring,$summer,$newSaved,$token,$advisor)
+      function initPLanDB($token, $year)
       {
 
-         //I will save here but now I just want to see display updated
-      $updateSql = "UPDATE `StudentPlans` SET `fall_quarter` = :fall,`winter_quarter`= :winter, 
-      `spring_quarter`= :spring, `summer_quarter` = :summer, `last_saved` = :saved, `advisor` = :advisor 
-      WHERE `unique_token` = :token ";
-      
-      $updateStatement = $this->_dbo->prepare($updateSql);
-      $updateStatement->bindParam(":token", $token);
-      $updateStatement->bindParam(":saved", $newSaved);
-      $updateStatement->bindParam(":fall", $fall);
-      $updateStatement->bindParam(":winter", $winter);
-      $updateStatement->bindParam(":spring", $spring);
-      $updateStatement->bindParam(":summer", $summer);
-      $updateStatement->bindParam(":advisor", $advisor);
-      $updateStatement->execute();
+        $insertSql = "INSERT INTO `Plan_Info`(`year_num`,`token`) 
+                  VALUES (:year, :token)";
+
+        $insertStatement = $this->_dbo->prepare($insertSql);
+        $insertStatement->bindParam(":token", $token);
+        $insertStatement->bindParam(":year", $year);              
+        $insertStatement->execute();
+      }
+
+      function updatePlanTable($year,$fall,$winter,$spring,$summer,$token)
+      {
+
+        $updateSql = "UPDATE Plan_Info
+        SET `fall` = :fall , `winter` = :winter, `spring` = :spring ,`summer` = :summer
+        WHERE `year_num` = :yearNum 
+        AND `token` = :token ";
+
+        $updateStatement = $this->_dbo->prepare($updateSql);
+        $updateStatement->bindParam(":yearNum", $year);
+        $updateStatement->bindParam(":fall", $fall);
+        $updateStatement->bindParam(":winter", $winter);
+        $updateStatement->bindParam(":spring", $spring);
+        $updateStatement->bindParam(":summer", $summer);
+        $updateStatement->bindParam(":token", $token);
+        $updateStatement->execute();
+      }
+
+      function updateTokenTable($token, $saved, $advisor)
+      {
+
+        $updateSql = "UPDATE Token_Info
+        SET `advisor` = :advisor, 
+        `last_saved` = :saved
+        WHERE `token` = :token ";
+
+        $updateStatement = $this->_dbo->prepare($updateSql);
+        $updateStatement->bindParam(":token", $token);
+        $updateStatement->bindParam(":advisor", $advisor);
+        $updateStatement->bindParam(":saved", $saved);
+        $updateStatement->execute();
 
       }
+
+
 
       /**
        * creates a DB entry for the passed token and the initial save time.
        * This save time is then returned to be displayed.
        * @return string of datetime
        */
-      function makeNewPlan($token)
+      function makeNewPlan($token,$prev,$future)
       {
       
       //Statement to insert the token  
-      $insertSql = "INSERT INTO `StudentPlans`(`unique_token`,`last_saved`) VALUES (:token,:saved)";
+      $insertSql = "INSERT INTO `Token_Info`(`token`,`last_saved`, `next_previous_year`, `next_future_year`) VALUES (:token,:saved, :prev, :future)";
       $saved = date_create('now')->format('Y-m-d H:i:s');
 
       $insertStatement = $this->_dbo->prepare($insertSql);
       $insertStatement->bindParam(":token", $token);
       $insertStatement->bindParam(":saved", $saved);
+      $insertStatement->bindParam(":prev", $prev);
+      $insertStatement->bindParam(":future", $future);
       $insertStatement->execute();
-
 
       return $saved;  
 
       }
 
+
        /**
-        * Retrieves all data currently stored associated with the provided token
+        * get every plan associated with this token in sorted order by plan number
         * @param mixed $token
         * @return array
         */
 
-      function retrieveData($token)
+      function retreivePlansInOrder($token)
       {
-        $selectSQL = "SELECT `fall_quarter`,`winter_quarter`,`spring_quarter`,`summer_quarter`,
-      `last_saved`, `advisor` FROM `StudentPlans` WHERE unique_token = :token ";
+        $selectSQL = "SELECT `fall`,`winter`,`spring`,`summer`, `year_num` FROM `Plan_Info` 
+        WHERE token = :token
+        ORDER BY `year_num`";
+        $selectStatement = $this->_dbo->prepare($selectSQL);
+        $selectStatement->bindParam(":token", $token);
+        $selectStatement->execute();
 
-      $selectStatement = $this->_dbo->prepare($selectSQL);
-      $selectStatement->bindParam(":token", $token);
-      $selectStatement->execute();
+       return $selectStatement->fetchAll((PDO::FETCH_ASSOC));
 
-      return $selectStatement->fetchAll((PDO::FETCH_ASSOC));
       }
 
+       /**
+        * retreive advisor andtim saved info associated with this token
+        * @param mixed $token
+        * @return array
+        */
+
+      function retreiveAdvisorAndTime($token)
+      {
+        $selectSQL = "SELECT `advisor`, `last_saved` FROM `Token_Info` 
+        WHERE token = :token;";
+
+        $selectStatement = $this->_dbo->prepare($selectSQL);
+        $selectStatement->bindParam(":token", $token);
+        $selectStatement->execute();
+
+       return $selectStatement->fetchAll((PDO::FETCH_ASSOC));
+      }
+
+
+
+      //TODO fix this to show all plans from the plan DB
       /**
         * Retrieves all data currently stored in the database
         * @param mixed $token
@@ -155,7 +195,9 @@ class Model
 
         function retrieveAllData()
         {
-          $selectSQL = "SELECT * FROM `StudentPlans`";
+          $selectSQL = "SELECT Token_Info.token, Token_Info.last_saved, Token_Info.advisor,Plan_Info.fall, Plan_Info.winter, Plan_Info.spring, Plan_Info.summer, Plan_Info.year_num
+          FROM  Token_Info
+          JOIN Plan_Info WHERE Token_Info.token = Plan_Info.token ";
   
           $selectStatement = $this->_dbo->prepare($selectSQL);
           $selectStatement->execute();
@@ -171,7 +213,7 @@ class Model
 
     function getExistingTokens()
     {
-      $sql = "SELECT `Unique_Token` FROM `StudentPlans`";
+      $sql = "SELECT `token` FROM `Token_Info`";
       $statement = $this->_dbo->prepare($sql);
       $statement->execute();
       return $statement->fetchAll((PDO::FETCH_ASSOC));

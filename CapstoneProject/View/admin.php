@@ -63,6 +63,9 @@
         <th>
             Advisor
         </th>
+        <th>
+            Year Number
+        </th>
     </tr>
     </thead>
     <tbody>";
@@ -72,13 +75,14 @@
       for ($i = 0; $i < $len; $i++)
       {
           echo"<tr>";
-          echo "<td>".$dbData[$i]["unique_token"]."</td>";
-          echo "<td>".$dbData[$i]["fall_quarter"]."</td>";
-          echo "<td>".$dbData[$i]["winter_quarter"]."</td>";
-          echo "<td>".$dbData[$i]["spring_quarter"]."</td>";
-          echo "<td>".$dbData[$i]["summer_quarter"]."</td>";
+          echo "<td>".$dbData[$i]["token"]."</td>";
+          echo "<td>".$dbData[$i]["fall"]."</td>";
+          echo "<td>".$dbData[$i]["winter"]."</td>";
+          echo "<td>".$dbData[$i]["spring"]."</td>";
+          echo "<td>".$dbData[$i]["summer"]."</td>";
           echo "<td>".$dbData[$i]["last_saved"]."</td>";
           echo "<td>".$dbData[$i]["advisor"]."</td>";
+          echo "<td>".$dbData[$i]["year_num"]."</td>";
           
           echo"</tr>";          
       }

@@ -6,7 +6,9 @@ date_default_timezone_set("America/Los_Angeles");
 require_once("../Model/Model.php");
 
 //Our model will just exist in a class since this is a simple project
-$model = new Model(); 
+$model = new Model();
+
+define("YEAR_STARTER",100);
   
 //Then We either redirect or display the results
 
@@ -17,13 +19,14 @@ $model = new Model();
   {
     header('Location: https://dleyba-brown.greenriverdev.com/CapstoneProject/View/');
   }
- // else
- // {
-    //Start session and set token
-    session_start();
-    $_SESSION["token"] =  $queryToken["planID"];
- // }  
 
+  //Start session and set token
+
+  if (session_status() === PHP_SESSION_NONE) 
+  {
+    session_start();
+  }
+  $_SESSION["token"] =  $queryToken["planID"];
 
 ?>
 
@@ -43,31 +46,44 @@ $model = new Model();
     //New plan then
     if(array_key_exists("new",$_POST))
     {
+      //Used to verify the token hasnt been modified
+      //could be expanded
+      if(strcmp($_SESSION["verifier"],$_SESSION["token"]) != 0)
+      {
+        echo "NO sql injection please!!";
+      } else
+      {
+        
+        $_SESSION["saved"] = $model->makeNewPlan($_SESSION["token"], YEAR_STARTER - 1, YEAR_STARTER + 1);
 
-      $_SESSION["saved"] = $model->makeNewPlan($_SESSION["token"]);
-      $_SESSION["fall"] = "";
-      $_SESSION["winter"] = "";
-      $_SESSION["spring"] = "";
-      $_SESSION["summer"] = "";
-      $_SESSION["advisor"] = "";
-     
-      include("form_template.php");
+        //generate their first entry into the plan database
+        $model->initPLanDB($_SESSION["token"], YEAR_STARTER);
+
+        $_SESSION["fall"] = "";
+        $_SESSION["winter"] = "";
+        $_SESSION["spring"] = "";
+        $_SESSION["summer"] = "";
+        $_SESSION["advisor"] = "";
+
+        include("form_template.php");
+      }
 
     }  
     else
     {
-      //retrieve data
+      //retrieve data they are visiting to edit or view
       if(empty($_POST))
       {
 
-        $currentData = $model->retrieveData($_SESSION["token"]);
+        $plans = $model->retreivePlansInOrder($_SESSION["token"]);
+        $_SESSION["fall"] = $plans[0]["fall"];
+        $_SESSION["winter"] = $plans[0]["winter"];
+        $_SESSION["spring"] = $plans[0]["spring"];
+        $_SESSION["summer"] = $plans[0]["summer"];
 
-        $_SESSION["saved"] = $currentData[0]["last_saved"];
-        $_SESSION["fall"] = $currentData[0]["fall_quarter"];
-        $_SESSION["winter"] = $currentData[0]["winter_quarter"];
-        $_SESSION["spring"] = $currentData[0]["spring_quarter"];
-        $_SESSION["summer"] = $currentData[0]["summer_quarter"];
-        $_SESSION["advisor"] = $currentData[0]["advisor"];
+        $otherInfo = $model->retreiveAdvisorAndTime($_SESSION["token"]);
+        $_SESSION["saved"] = $otherInfo[0]["last_saved"];
+        $_SESSION["advisor"] = $otherInfo[0]["advisor"];
 
         include("form_template.php");
 
@@ -75,10 +91,15 @@ $model = new Model();
       //then its a new save
       else
       {
+    
         //Save into the database
         $newSaved = date_create('now')->format('Y-m-d H:i:s');
-        $model->updateData($_POST["fall"],$_POST["winter"],$_POST["spring"],$_POST["summer"],$newSaved,$_SESSION["token"]
-        ,$_POST["advisor"]);
+        //100 is 
+
+        $model->updatePlanTable(YEAR_STARTER,$_POST["fall"],$_POST["winter"]
+        ,$_POST["spring"],$_POST["summer"],$_SESSION["token"]);
+
+        $model->updateTokenTable($_SESSION["token"], $newSaved, $_POST["advisor"]);
 
         //Update our session variables
         $_SESSION["saved"] = $newSaved;

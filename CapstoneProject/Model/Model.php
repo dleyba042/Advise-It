@@ -273,6 +273,38 @@ class Model
       $statement->execute();
       return $statement->fetchAll((PDO::FETCH_ASSOC));
     } 
+
+    function initOldPlan($token)
+    {
+
+      //TODO just testing ajax IT WORKSSSSSSSSSSSS
+
+      $save = date_create('now')->format('Y-m-d H:i:s');
+
+      $updateSql = "UPDATE Token_Info
+      SET `last_saved` = :saved
+      WHERE `token` = :token ";
+
+      $updateStatement = $this->_dbo->prepare($updateSql);
+      $updateStatement->bindParam(":saved", $save);
+      $updateStatement->bindParam(":token", $token);
+      $updateStatement->execute();
+
+
+
+        //TODO FiGURE HTIS OUT
+        /*
+
+        $getYear = "SELECT  `next_previous_year` WHERE `token` = :token";
+
+        $yearStatement = $this->_dbo->prepare($getYear);
+        $yearStatement->bindParam(":token", $token);
+        $yearStatement->execute();
+        */
+
+
+    
+    }
       
 }
 ?>

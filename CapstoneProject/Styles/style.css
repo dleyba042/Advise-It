@@ -23,6 +23,10 @@ textarea {
   margin: auto;
 }
 
+body {
+  text-align: center;
+}
+
 /* ID's */
 
 #index_div {

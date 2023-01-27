@@ -9,6 +9,7 @@ require_once("../Model/Model.php");
 $model = new Model();
 
 define("YEAR_STARTER",100);
+
   
 //Then We either redirect or display the results
 
@@ -27,6 +28,7 @@ define("YEAR_STARTER",100);
     session_start();
   }
 
+
   $_SESSION["token"] =  $queryToken["planID"];
   $displayToken = "https://dleyba-brown.greenriverdev.com/CapstoneProject/View/advise.php?planID=". $_SESSION["token"];
 ?>
@@ -39,11 +41,16 @@ define("YEAR_STARTER",100);
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Advise-It Tool</title>
     <link rel="stylesheet" href="../Styles/style.css" />
+
+    <!-- CDN for JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" 
+    integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" 
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   </head>
   <body>
 
-  <form action="#" id="plan_form" method = "post">  
-
+   
   <div class= "header_footer">
     <h1>Student Plans</h1>
   </div>
@@ -51,6 +58,10 @@ define("YEAR_STARTER",100);
   <div id='token_div'>
       <h4> <?php echo "Link to view and edit plans: <a href = ' ". $displayToken."'>". $displayToken."</a>" ?></h4>
   </div>
+
+  <button type="button" name="prev_button" id="prev_button" value = "<?php echo $_SESSION["token"] ?>"> add previous year</button>
+
+  <form action="#" id="plan_form" method = "post"> 
 
     <?php
 
@@ -75,6 +86,7 @@ define("YEAR_STARTER",100);
         $_SESSION["summer"] = "";
         $_SESSION["advisor"] = "";
         $_SESSION["year_num"] = YEAR_STARTER;
+        $_SESSION["school_year"] = $initialYear;
 
         echo "<h1>" . $initialYear . " School Year </h1>";
         include("form_template.php");
@@ -113,6 +125,7 @@ define("YEAR_STARTER",100);
       //then its a new save
       else
       {
+
         //Save into the easy stuff first
         $newSaved = date_create('now')->format('Y-m-d H:i:s');
         $model->updateTokenTable($_SESSION["token"], $newSaved, $_POST["advisor"]);
@@ -207,6 +220,8 @@ USE WHEN NEW YEARS ARE ADDED
     }
     ?>
 
+    <button type="button" name="next_button" id="next_button" value = "<?php echo $_SESSION["token"] ?>"> add next year</button>
+
     <div id = "button_div">
       <button class = "plan_button" id="submit_button" type="submit" form="plan_form"> SAVE </button>  
       <button class = "plan_button" id = "print_button" type="button"> PRINT </button>
@@ -218,6 +233,7 @@ USE WHEN NEW YEARS ARE ADDED
     </div>
 
   </form>
+
  <script src='../JS/advise.js' type='text/javascript'> </script>
 
   </body>

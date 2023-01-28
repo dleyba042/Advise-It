@@ -85,7 +85,7 @@ $model = new Model();
         //Dynamically create the button so we can limit the years added
         echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
         //div to append plans to
-        echo "<div id = 'allPlans'> ";
+        echo "<div id = 'all_plans'> ";
         echo "<h1>" . $initialYear . " School Year </h1>";
         include("form_template.php");
         echo "</div> ";
@@ -104,13 +104,21 @@ $model = new Model();
 
         $plans = $model->retreivePlansInOrder($_SESSION["token"]);
 
-        $initialYear = $plans[0]['school_year'];
+        $initialYear = $model->getInitialYear($_SESSION["token"]);
+        $initialYear = $initialYear[0]["initial_year"];
+
+        echo "INITIAL YEAR::::::::?? {$initialYear}";
+
+        //TODO
+        //TODO
+        //TODO SET PREVIOUS WHEN INSIDE THE FIRST ELEMENT IN THE LIST ITS NOT ALWAYS ONE LESS THAN INITIAL YEAR DUHH
+
         $prev = $initialYear - 1;
 
         //Create previous button
         echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
         //div to append plans to
-        echo "<div id = 'allPlans'> ";
+        echo "<div id = 'all_plans'> ";
 
          //for each plan in order
         //update my variables and put them in session
@@ -152,13 +160,20 @@ $model = new Model();
         $yearsToUpdate = $model->getSchoolYearsInOrder($_SESSION["token"]);
 
         //generate previous button
-        $initialYear = $yearsToUpdate[0]['school_year'];
+        $initialYear = $model->getInitialYear($_SESSION["token"]);
+        $initialYear = $initialYear[0]["initial_year"];
+
         $prev = $initialYear - 1;
+
+        //TODO
+        //TODO
+        //TODO SET PREVIOUS WHEN INSIDE THE FIRST ELEMENT IN THE LIST ITS NOT ALWAYS ONE LESS THAN INITIAL YEAR DUHH
+        //ALSO MAYBE DONT EVEN APPEND FROM JS just make the screen refrsh and the new year should be there ???
 
         //Create previous button
         echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
         //div to append plans to
-        echo "<div id = 'allPlans'> ";
+        echo "<div id = 'all_plans'> ";
 
         //Update all years associated with this token
         for ($i = 0; $i < count($yearsToUpdate); $i++) 

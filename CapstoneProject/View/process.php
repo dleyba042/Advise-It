@@ -8,12 +8,4 @@ require_once("../Model/Model.php");
 
 $model = new Model();
 
-if($_POST["prev_button"])
-{
-    $model->initOldPlan($_POST["token"]);
-}
-else
-{
-    //DO THE OTHER ONE
-    //PROBABLY SHOULD REARANGE MY FILES TOO!!!
-}
+$model->initNewPlanYear($_POST["token"],$_POST["year"]);

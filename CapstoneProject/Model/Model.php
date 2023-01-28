@@ -74,7 +74,6 @@ class Model
         return $generatedtoken;
       }
 
-
       /**
        * 
        *
@@ -134,8 +133,6 @@ class Model
         $updateStatement->execute();
       }
 
-
-
       /**
        * creates a DB entry for the passed token and the initial save time.
        * This save time is then returned to be displayed.
@@ -145,48 +142,18 @@ class Model
       {
       
       //Statement to insert the token  
-      $insertSql = "INSERT INTO `Token_Info`(`token`,`last_saved`, `next_previous_year`, `next_future_year`, `initial_year`) VALUES 
-      (:token,:saved, :prev, :future, :initial)";
+      $insertSql = "INSERT INTO `Token_Info`(`token`,`last_saved`, `initial_year`) VALUES 
+      (:token,:saved, :initial)";
       
       $saved = date_create('now')->format('Y-m-d H:i:s');
-
-      $prev = $initialYear - 1;
-      $future = $initialYear + 1;
 
       $insertStatement = $this->_dbo->prepare($insertSql);
       $insertStatement->bindParam(":token", $token);
       $insertStatement->bindParam(":saved", $saved);
-      $insertStatement->bindParam(":prev", $prev);
-      $insertStatement->bindParam(":future", $future);
       $insertStatement->bindParam(":initial", $initialYear);
       $insertStatement->execute();
 
       return $saved;  
-      }
-
-
-      function determinePlanCount($token)
-      {
-        $count = "SELECT Count(*)FROM `Plan_Info` WHERE `token` = :token";
-        $statement = $this->_dbo->prepare($count);
-        $statement->bindParam(":token", $token);
-        $statement->execute();
-        return $statement->fetchAll();
-      }
-
-      function determineStartAndEndYear($token)
-      {
-        $sql = "SELECT `next_previous_year` AS `oldest`, `next_future_year` AS `newest` FROM `Token_Info` WHERE `token` = :token ";
-        $statement = $this->_dbo->prepare($sql);
-        $statement->bindParam(":token", $token);
-        $statement->execute();
-        $years =  $statement->fetchAll(PDO::FETCH_ASSOC);
-    
-        //THESE NEED TO BE ADJUSTED AS THEY HOLD THE PLACE OF NEXT VALID YEAR NOT A YEAR THAT CURRENTLY EXISTS
-        $years[0]["oldest"]++; 
-        $years[0]["newest"]--;
-
-        return $years;
       }
 
       function getSchoolYearsInOrder($token)
@@ -228,7 +195,7 @@ class Model
       function retreiveAdvisorAndTime($token)
       {
         $selectSQL = "SELECT `advisor`, `last_saved` FROM `Token_Info` 
-        WHERE token = :token;";
+        WHERE token = :token ";
 
         $selectStatement = $this->_dbo->prepare($selectSQL);
         $selectStatement->bindParam(":token", $token);
@@ -271,37 +238,34 @@ class Model
       return $statement->fetchAll((PDO::FETCH_ASSOC));
     } 
 
-    function initOldPlan($token)
+     /**
+      * Create initial entry in plan_info table for this new school year
+      * @param mixed $token
+      * @param mixed $year
+      * @return mixed
+      */
+
+    function initNewPlanYear($token,$year)
     {
+        $insertSql = "INSERT INTO `Plan_Info`(`token`,`school_year`) 
+        VALUES (:token, :schoolYear)";
 
-      //TODO just testing ajax IT WORKSSSSSSSSSSSS
-
-      $save = date_create('now')->format('Y-m-d H:i:s');
-
-      $updateSql = "UPDATE Token_Info
-      SET `last_saved` = :saved
-      WHERE `token` = :token ";
-
-      $updateStatement = $this->_dbo->prepare($updateSql);
-      $updateStatement->bindParam(":saved", $save);
-      $updateStatement->bindParam(":token", $token);
-      $updateStatement->execute();
-
-
-
-        //TODO FiGURE HTIS OUT
-        /*
-
-        $getYear = "SELECT  `next_previous_year` WHERE `token` = :token";
-
-        $yearStatement = $this->_dbo->prepare($getYear);
-        $yearStatement->bindParam(":token", $token);
-        $yearStatement->execute();
-        */
-
-
-    
+        $insertStatement = $this->_dbo->prepare($insertSql);
+        $insertStatement->bindParam(":token", $token);
+        $insertStatement->bindParam(":schoolYear", $year);                 
+        $insertStatement->execute();
     }
+
+    function getInitialYear($token)
+    {
+       $sql = "SELECT `initial_year` 
+       FROM `Token_Info` WHERE `token` = :token";
+       $statement = $this->_dbo->prepare($sql);
+       $statement->bindParam(":token", $token);
+       $statement->execute();
+       return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
       
 }
 ?>

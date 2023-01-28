@@ -9,7 +9,6 @@ class Model
 
     function __construct() 
      {
-
         require("/home/dleybab1/PDOConfig.php");
         try 
         {
@@ -83,11 +82,10 @@ class Model
        * @param mixed $yearNum
        * @return int|string the shcool year that this plan was created
        */
-      function initPLanDB($token, $yearNum)
+      function initPLanDB($token)
       {
-
-        $insertSql = "INSERT INTO `Plan_Info`(`year_num`,`token`,`school_year`) 
-                  VALUES (:yearNum, :token, :schoolYear)";
+        $insertSql = "INSERT INTO `Plan_Info`(`token`,`school_year`) 
+                  VALUES (:token, :schoolYear)";
 
         $schoolYear = date("Y");
         $month = date("m");
@@ -98,24 +96,22 @@ class Model
 
         $insertStatement = $this->_dbo->prepare($insertSql);
         $insertStatement->bindParam(":token", $token);
-        $insertStatement->bindParam(":yearNum", $yearNum);  
         $insertStatement->bindParam(":schoolYear", $schoolYear);                 
         $insertStatement->execute();
 
         return $schoolYear;
-    
       }
 
-      function updatePlanTable($year,$fall,$winter,$spring,$summer,$token)
+      function updatePlanTable($schoolYear,$fall,$winter,$spring,$summer,$token)
       {
 
         $updateSql = "UPDATE Plan_Info
         SET `fall` = :fall , `winter` = :winter, `spring` = :spring ,`summer` = :summer
-        WHERE `year_num` = :yearNum 
+        WHERE `school_year` = :schoolYear
         AND `token` = :token ";
 
         $updateStatement = $this->_dbo->prepare($updateSql);
-        $updateStatement->bindParam(":yearNum", $year);
+        $updateStatement->bindParam(":schoolYear", $schoolYear);
         $updateStatement->bindParam(":fall", $fall);
         $updateStatement->bindParam(":winter", $winter);
         $updateStatement->bindParam(":spring", $spring);
@@ -126,7 +122,6 @@ class Model
 
       function updateTokenTable($token, $saved, $advisor)
       {
-
         $updateSql = "UPDATE Token_Info
         SET `advisor` = :advisor, 
         `last_saved` = :saved
@@ -137,7 +132,6 @@ class Model
         $updateStatement->bindParam(":advisor", $advisor);
         $updateStatement->bindParam(":saved", $saved);
         $updateStatement->execute();
-
       }
 
 
@@ -147,22 +141,27 @@ class Model
        * This save time is then returned to be displayed.
        * @return string of datetime
        */
-      function makeNewPlan($token,$prev,$future)
+      function makeNewPlan($token,$initialYear)
       {
       
       //Statement to insert the token  
-      $insertSql = "INSERT INTO `Token_Info`(`token`,`last_saved`, `next_previous_year`, `next_future_year`) VALUES (:token,:saved, :prev, :future)";
+      $insertSql = "INSERT INTO `Token_Info`(`token`,`last_saved`, `next_previous_year`, `next_future_year`, `initial_year`) VALUES 
+      (:token,:saved, :prev, :future, :initial)";
+      
       $saved = date_create('now')->format('Y-m-d H:i:s');
+
+      $prev = $initialYear - 1;
+      $future = $initialYear + 1;
 
       $insertStatement = $this->_dbo->prepare($insertSql);
       $insertStatement->bindParam(":token", $token);
       $insertStatement->bindParam(":saved", $saved);
       $insertStatement->bindParam(":prev", $prev);
       $insertStatement->bindParam(":future", $future);
+      $insertStatement->bindParam(":initial", $initialYear);
       $insertStatement->execute();
 
       return $saved;  
-
       }
 
 
@@ -190,17 +189,16 @@ class Model
         return $years;
       }
 
-      function getSchoolYear($token,$yearNum)
+      function getSchoolYearsInOrder($token)
       {
           $sql = "SELECT `school_year` FROM `Plan_Info` 
-          WHERE `token`  = :token AND `year_num` = :yearNum ";
+          WHERE `token`  = :token ";
           $statement = $this->_dbo->prepare($sql);
           $statement->bindParam(":token", $token);
-          $statement->bindParam(":yearNum", $yearNum);
           $statement->execute();
           return  $statement->fetchAll(PDO::FETCH_ASSOC);        
       }
-
+      
 
        /**
         * get every plan associated with this token in sorted order by plan number
@@ -210,15 +208,14 @@ class Model
 
       function retreivePlansInOrder($token)
       {
-        $selectSQL = "SELECT `fall`,`winter`,`spring`,`summer`, `school_year`, `year_num` FROM `Plan_Info` 
+        $selectSQL = "SELECT `fall`,`winter`,`spring`,`summer`, `school_year` FROM `Plan_Info` 
         WHERE token = :token
-        ORDER BY `year_num`";
+        ORDER BY `school_year`";
         $selectStatement = $this->_dbo->prepare($selectSQL);
         $selectStatement->bindParam(":token", $token);
         $selectStatement->execute();
 
        return $selectStatement->fetchAll((PDO::FETCH_ASSOC));
-
       }
 
        /**
@@ -240,7 +237,6 @@ class Model
       }
 
 
-
       //
       /**
         * Retrieves all data currently stored in the database
@@ -250,7 +246,7 @@ class Model
 
         function retrieveAllData()
         {
-          $selectSQL = "SELECT Token_Info.token, Token_Info.last_saved, Token_Info.advisor,Plan_Info.fall, Plan_Info.winter, Plan_Info.spring, Plan_Info.summer, Plan_Info.year_num
+          $selectSQL = "SELECT Token_Info.token, Token_Info.last_saved, Token_Info.advisor,Plan_Info.fall, Plan_Info.winter, Plan_Info.spring, Plan_Info.summer, Plan_Info.school_year
           FROM  Token_Info
           JOIN Plan_Info WHERE Token_Info.token = Plan_Info.token ";
   

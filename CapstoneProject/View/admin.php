@@ -64,7 +64,7 @@
             Advisor
         </th>
         <th>
-            Year Number
+            School Year
         </th>
     </tr>
     </thead>
@@ -82,7 +82,7 @@
           echo "<td>".$dbData[$i]["summer"]."</td>";
           echo "<td>".$dbData[$i]["last_saved"]."</td>";
           echo "<td>".$dbData[$i]["advisor"]."</td>";
-          echo "<td>".$dbData[$i]["year_num"]."</td>";
+          echo "<td>".$dbData[$i]["school_year"]."</td>";
           
           echo"</tr>";          
       }

@@ -53,8 +53,6 @@ $model = new Model();
       <h4> <?php echo "Link to view and edit plans: <a href = ' ". $displayToken."'>". $displayToken."</a>" ?></h4>
   </div>
 
-  <button type="button" name="prev_button" id="prev_button" value = "<?php echo $_SESSION["token"] ?>"> add previous year</button>
-
   <form action="#" id="plan_form" method = "post"> 
 
     <?php
@@ -80,8 +78,20 @@ $model = new Model();
         $_SESSION["advisor"] = "";
         $_SESSION["school_year"] = $initialYear;
 
+        $token = $_SESSION["token"];
+        $prev = $initialYear - 1;
+        $next = $initialYear + 1;
+
+        //Dynamically create the button so we can limit the years added
+        echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
+        //div to append plans to
+        echo "<div id = 'allPlans'> ";
         echo "<h1>" . $initialYear . " School Year </h1>";
         include("form_template.php");
+        echo "</div> ";
+        //Generate next button
+        echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
+
       }
     } else 
     {
@@ -94,10 +104,17 @@ $model = new Model();
 
         $plans = $model->retreivePlansInOrder($_SESSION["token"]);
 
-        //for each plan in order
+        $initialYear = $plans[0]['school_year'];
+        $prev = $initialYear - 1;
+
+        //Create previous button
+        echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
+        //div to append plans to
+        echo "<div id = 'allPlans'> ";
+
+         //for each plan in order
         //update my variables and put them in session
         //then add to the form template
-    
         for ($i = 0; $i < count($plans); $i++) 
         {
           $_SESSION["fall"] = $plans[$i]["fall"];
@@ -107,8 +124,19 @@ $model = new Model();
           $_SESSION["school_year"] = $plans[$i]["school_year"];
 
           echo "<h1> " . $plans[$i]["school_year"] . " School Year</h1>";
-          include("form_template.php");
+          include("form_template.php");          
+
+          if($i == count($plans) - 1)
+          {
+            echo "</div> ";
+            $next = $plans[$i]["school_year"] + 1;
+            echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
+          }
+
+
         }
+
+
       }
       //then its a new save
       else 
@@ -122,6 +150,15 @@ $model = new Model();
         $_SESSION["advisor"] = $_POST["advisor"];
 
         $yearsToUpdate = $model->getSchoolYearsInOrder($_SESSION["token"]);
+
+        //generate previous button
+        $initialYear = $yearsToUpdate[0]['school_year'];
+        $prev = $initialYear - 1;
+
+        //Create previous button
+        echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
+        //div to append plans to
+        echo "<div id = 'allPlans'> ";
 
         //Update all years associated with this token
         for ($i = 0; $i < count($yearsToUpdate); $i++) 
@@ -143,12 +180,17 @@ $model = new Model();
 
           //Display the updated page
           include("form_template.php");
+
+          if($i == count($yearsToUpdate) - 1)
+          {
+            echo "</div> ";
+            $next = $yearsToUpdate[$i]["school_year"] + 1;
+            echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
+          }
         }
       }
     }
     ?>
-
-    <button type="button" name="next_button" id="next_button" value = "<?php echo $_SESSION["token"] ?>"> add next year</button>
 
     <div id = "button_div">
       <button class = "plan_button" id="submit_button" type="submit" form="plan_form"> SAVE </button>  

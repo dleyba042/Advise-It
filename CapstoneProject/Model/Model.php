@@ -192,7 +192,8 @@ class Model
       function getSchoolYearsInOrder($token)
       {
           $sql = "SELECT `school_year` FROM `Plan_Info` 
-          WHERE `token`  = :token ";
+          WHERE `token`  = :token 
+          ORDER BY `school_year`";
           $statement = $this->_dbo->prepare($sql);
           $statement->bindParam(":token", $token);
           $statement->execute();

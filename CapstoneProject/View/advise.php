@@ -106,8 +106,7 @@ $model = new Model();
 
         $initialYear = $model->getInitialYear($_SESSION["token"]);
         $initialYear = $initialYear[0]["initial_year"];
-
-        
+      
          //for each plan in order
         //update my variables and put them in session
         //then add to the form template
@@ -115,7 +114,7 @@ $model = new Model();
         {
           if($i == 0)
           {
-            $prev = $plans["school_year"] - 1;
+            $prev = $plans[$i]["school_year"] - 1;
             //Create previous button
             echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
             //div to append plans to

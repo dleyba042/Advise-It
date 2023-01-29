@@ -146,7 +146,6 @@ $model = new Model();
       //then its a new save
       else 
       {
-
         //Save into the easy stuff first
         $newSaved = date_create('now')->format('Y-m-d H:i:s');
         $model->updateTokenTable($_SESSION["token"], $newSaved, $_POST["advisor"]);
@@ -218,7 +217,8 @@ $model = new Model();
 
           if($yearsToUpdate == 1)
           {
-            $next = $arrYear + ((count($_POST) - 1) / 4) - 1;
+            $next = $arrYear + 1;
+
             echo "</div> ";
             echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
           }

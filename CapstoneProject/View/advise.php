@@ -142,14 +142,10 @@ $model = new Model();
             echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
           }
         }
-
-
       }
       //then its a new save
       else 
       {
-
-      //  var_dump($_POST);
 
         //Save into the easy stuff first
         $newSaved = date_create('now')->format('Y-m-d H:i:s');
@@ -159,14 +155,12 @@ $model = new Model();
         $_SESSION["saved"] = $newSaved;
         $_SESSION["advisor"] = $_POST["advisor"];
 
-
         //POST goes in order from top to bottom
         //I send advisor so that throws the count off by one 
         // but if we minus count($_Post) by one and thn we divide by four
         //we know how many to update
-        //$yearsToUpdate = $model->getSchoolYearsInOrder($_SESSION["token"]);
         $yearsToUpdate = (count($_POST) - 1) / 4;
-        $firstYear = $yearsToUpdate; //TODO MAYBE WRONG
+        $firstYear = $yearsToUpdate; 
 
         //generate previous button
         $initialYear = $model->getInitialYear($_SESSION["token"]);
@@ -175,8 +169,6 @@ $model = new Model();
         $firstKey = array_key_first($_POST);
         $arrYear = explode("_",$firstKey);
         $arrYear = $arrYear[1];
-
-        echo "YEARS to update = $yearsToUpdate";
         
         while($yearsToUpdate >= 1)
         {

@@ -266,6 +266,33 @@ class Model
        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    function yearExists($token, $year)
+    {
+      $check = "SELECT `school_year` FROM `Plan_Info` WHERE `token` = :token AND `school_year` = :year";
+      $statement = $this->_dbo->prepare($check);
+      $statement->bindParam(":token", $token);
+      $statement->bindParam(":year", $year);
+      $statement->execute();
+
+      $count = $statement->fetchAll(PDO::FETCH_ASSOC);
+      return count($count) != 0;
+    }
+
+    function createNewPlanEntry($token,$year,$fall,$winter,$spring,$summer)
+    {
+      $insertSql = "INSERT INTO `Plan_Info`(`school_year`, `fall`, `winter`, `spring`, `summer`, `token`) 
+        VALUES (:schoolYear,:fall,:winter,:spring,:summer,:token)";
+
+        $statement = $this->_dbo->prepare($insertSql);
+        $statement->bindParam(":schoolYear", $year);
+        $statement->bindParam(":fall", $fall);
+        $statement->bindParam(":winter", $winter);
+        $statement->bindParam(":spring", $spring);
+        $statement->bindParam(":summer", $summer);
+        $statement->bindParam(":token", $token);
+        $statement->execute();
+    }
+
       
 }
 ?>

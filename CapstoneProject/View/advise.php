@@ -67,30 +67,35 @@ $model = new Model();
         echo "NO sql injection please!!";
       } else
       {
-        //generate their first entry into the plan database
-        $initialYear = $model->initPLanDB($_SESSION["token"]);
 
-        $_SESSION["saved"] = $model->makeNewPlan($_SESSION["token"], $initialYear);
+        $schoolYear = date("Y");
+        $month = date("m");
+        if($month <= 7) 
+        {
+          $schoolYear--;
+        }
+
+        $_SESSION["saved"] = $model->makeNewPlan($_SESSION["token"], $schoolYear);
         $_SESSION["fall"] = "";
         $_SESSION["winter"] = "";
         $_SESSION["spring"] = "";
         $_SESSION["summer"] = "";
         $_SESSION["advisor"] = "";
-        $_SESSION["school_year"] = $initialYear;
+        $_SESSION["school_year"] = $schoolYear;
 
         $token = $_SESSION["token"];
-        $prev = $initialYear - 1;
-        $next = $initialYear + 1;
+        $prev = $schoolYear - 1;
+        $next = $schoolYear + 1;
 
         //Dynamically create the button so we can limit the years added
-        echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
+        echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$schoolYear'> add previous year</button>";
         //div to append plans to
         echo "<div id = 'all_plans'> ";
-        echo "<h1>" . $initialYear . " School Year </h1>";
+        echo "<h1>" . $schoolYear . " School Year </h1>";
         include("form_template.php");
         echo "</div> ";
         //Generate next button
-        echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
+        echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$schoolYear'> add next year</button>"; 
 
       }
     } else 
@@ -136,8 +141,6 @@ $model = new Model();
             $next = $plans[$i]["school_year"] + 1;
             echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
           }
-
-
         }
 
 
@@ -145,6 +148,9 @@ $model = new Model();
       //then its a new save
       else 
       {
+
+      //  var_dump($_POST);
+
         //Save into the easy stuff first
         $newSaved = date_create('now')->format('Y-m-d H:i:s');
         $model->updateTokenTable($_SESSION["token"], $newSaved, $_POST["advisor"]);
@@ -153,49 +159,80 @@ $model = new Model();
         $_SESSION["saved"] = $newSaved;
         $_SESSION["advisor"] = $_POST["advisor"];
 
-        $yearsToUpdate = $model->getSchoolYearsInOrder($_SESSION["token"]);
+
+        //POST goes in order from top to bottom
+        //I send advisor so that throws the count off by one 
+        // but if we minus count($_Post) by one and thn we divide by four
+        //we know how many to update
+        //$yearsToUpdate = $model->getSchoolYearsInOrder($_SESSION["token"]);
+        $yearsToUpdate = (count($_POST) - 1) / 4;
+        $firstYear = $yearsToUpdate; //TODO MAYBE WRONG
 
         //generate previous button
         $initialYear = $model->getInitialYear($_SESSION["token"]);
         $initialYear = $initialYear[0]["initial_year"];
 
-        //Update all years associated with this token
-        for ($i = 0; $i < count($yearsToUpdate); $i++) 
-        {
-          $year = $yearsToUpdate[$i]["school_year"];
+        $firstKey = array_key_first($_POST);
+        $arrYear = explode("_",$firstKey);
+        $arrYear = $arrYear[1];
 
-          if($i == 0)
+        echo "YEARS to update = $yearsToUpdate";
+        
+        while($yearsToUpdate >= 1)
+        {
+        //Update all years associated with this token
+        
+          if($yearsToUpdate == $firstYear)
           {
             //Must do it here to get the right value for previous
-            $prev = $year - 1;
+            $prev = $arrYear - 1;
+          
             //Create previous button
             echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
             //div to append plans to
             echo "<div id = 'all_plans'> ";
-          }          
+          }
 
-          $model->updatePlanTable($year, $_POST["fall_$year"], $_POST["winter_$year"]
-            , $_POST["spring_$year"], $_POST["summer_$year"], $_SESSION["token"]
+          $key1 = "fall_$arrYear";
+          $key2 = "winter_$arrYear";
+          $key3 = "spring_$arrYear";
+          $key4 = "summer_$arrYear";
+          $yearExists = $model->yearExists($_SESSION["token"], $arrYear);
+
+          //either create new entry or update existing
+          if(!$yearExists)
+          {
+            $model->createNewPlanEntry($_SESSION["token"],$arrYear, $_POST[$key1], $_POST[$key2]
+            , $_POST[$key3], $_POST[$key4]);
+          }
+          else
+          {
+            $model->updatePlanTable($arrYear, $_POST[$key1], $_POST[$key2]
+            , $_POST[$key3], $_POST[$key4], $_SESSION["token"]
           );
+          }
 
           //Update our session variables
-          $_SESSION["fall"] = $_POST["fall_$year"];
-          $_SESSION["winter"] = $_POST["winter_$year"];
-          $_SESSION["spring"] = $_POST["spring_$year"];
-          $_SESSION["summer"] = $_POST["summer_$year"];
-          $_SESSION["school_year"] = $year;
+          $_SESSION["fall"] = $_POST[$key1];
+          $_SESSION["winter"] = $_POST[$key2];
+          $_SESSION["spring"] = $_POST[$key3];
+          $_SESSION["summer"] = $_POST[$key4];
+          $_SESSION["school_year"] = $arrYear;
         
           echo "<h1> " . $_SESSION["school_year"] . " School Year </h1>";
 
           //Display the updated page
           include("form_template.php");
 
-          if($i == count($yearsToUpdate) - 1)
+          if($yearsToUpdate == 1)
           {
+            $next = $arrYear + ((count($_POST) - 1) / 4) - 1;
             echo "</div> ";
-            $next = $yearsToUpdate[$i]["school_year"] + 1;
             echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
           }
+        
+          $arrYear++;
+          $yearsToUpdate -= 1;
         }
       }
     }

@@ -22,8 +22,6 @@ $("#prev_button").click(function (e) {
   if (initialYear - nextYearUp > 2) {
     alert("cannot got back further than two years!");
   } else {
-    console.log("PREV BUTTON :: INTI YEAR: " + nextYearUp);
-
     //Create an initial DB entry for this plan year
     e.preventDefault();
     $.ajax({
@@ -34,6 +32,9 @@ $("#prev_button").click(function (e) {
         alert("ok");
       },
     });
+
+    //Adjust previous button value
+    prevButton.value = `${studentToken}:${nextYearUp - 1}:${initialYear}`;
 
     //Append a new template for this year
 
@@ -66,6 +67,11 @@ $("#next_button").click(function (e) {
         alert("ok");
       },
     });
+
+    //Adjust next button value
+    nextButton.value = `${studentToken}:${
+      parseInt(nextYearUp) + 1
+    }:${initialYear}`;
 
     //Append a new template for this year
 

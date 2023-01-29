@@ -107,24 +107,21 @@ $model = new Model();
         $initialYear = $model->getInitialYear($_SESSION["token"]);
         $initialYear = $initialYear[0]["initial_year"];
 
-        echo "INITIAL YEAR::::::::?? {$initialYear}";
-
-        //TODO
-        //TODO
-        //TODO SET PREVIOUS WHEN INSIDE THE FIRST ELEMENT IN THE LIST ITS NOT ALWAYS ONE LESS THAN INITIAL YEAR DUHH
-
-        $prev = $initialYear - 1;
-
-        //Create previous button
-        echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
-        //div to append plans to
-        echo "<div id = 'all_plans'> ";
-
+        
          //for each plan in order
         //update my variables and put them in session
         //then add to the form template
         for ($i = 0; $i < count($plans); $i++) 
         {
+          if($i == 0)
+          {
+            $prev = $plans["school_year"] - 1;
+            //Create previous button
+            echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
+            //div to append plans to
+            echo "<div id = 'all_plans'> ";
+          }
+
           $_SESSION["fall"] = $plans[$i]["fall"];
           $_SESSION["winter"] = $plans[$i]["winter"];
           $_SESSION["spring"] = $plans[$i]["spring"];
@@ -163,22 +160,20 @@ $model = new Model();
         $initialYear = $model->getInitialYear($_SESSION["token"]);
         $initialYear = $initialYear[0]["initial_year"];
 
-        $prev = $initialYear - 1;
-
-        //TODO
-        //TODO
-        //TODO SET PREVIOUS WHEN INSIDE THE FIRST ELEMENT IN THE LIST ITS NOT ALWAYS ONE LESS THAN INITIAL YEAR DUHH
-        //ALSO MAYBE DONT EVEN APPEND FROM JS just make the screen refrsh and the new year should be there ???
-
-        //Create previous button
-        echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
-        //div to append plans to
-        echo "<div id = 'all_plans'> ";
-
         //Update all years associated with this token
         for ($i = 0; $i < count($yearsToUpdate); $i++) 
         {
           $year = $yearsToUpdate[$i]["school_year"];
+
+          if($i == 0)
+          {
+            //Must do it here to get the right value for previous
+            $prev = $year - 1;
+            //Create previous button
+            echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
+            //div to append plans to
+            echo "<div id = 'all_plans'> ";
+          }          
 
           $model->updatePlanTable($year, $_POST["fall_$year"], $_POST["winter_$year"]
             , $_POST["spring_$year"], $_POST["summer_$year"], $_SESSION["token"]

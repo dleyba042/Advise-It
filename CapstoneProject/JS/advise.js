@@ -72,11 +72,13 @@ const createNewPlanForm = (year) => {
     let textContainer = document.createElement("div");
     textContainer.classList.add("textContainer");
 
+    let month = months[i].charAt(0).toUpperCase() + months[i].substring(1);
+
     let header = document.createElement("h5");
     if (i == 0) {
-      header.innerHTML = `${months[i]} ${year}`;
+      header.innerHTML = `${month} ${year}`;
     } else {
-      header.innerHTML = `${months[i]} ${parseInt(year) + 1}`;
+      header.innerHTML = `${month} ${parseInt(year) + 1}`;
     }
 
     let textarea = document.createElement("textarea");

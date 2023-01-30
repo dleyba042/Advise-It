@@ -76,6 +76,10 @@ $model = new Model();
         }
 
         $_SESSION["saved"] = $model->makeNewPlan($_SESSION["token"], $schoolYear);
+        
+        //INIT PLAN DB for this start school year so the token doesnt get thrown out
+        $model->initPLanDB($_SESSION["token"]);
+
         $_SESSION["fall"] = "";
         $_SESSION["winter"] = "";
         $_SESSION["spring"] = "";

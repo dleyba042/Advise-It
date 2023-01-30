@@ -55,7 +55,6 @@ $model = new Model();
   <form action="#" id="plan_form" method = "post"> 
 
     <?php
-
     //New plan then
     if(array_key_exists("new",$_POST))
     {
@@ -106,7 +105,6 @@ $model = new Model();
         //generate previous button
         $initialYear = $model->getInitialYear($_SESSION["token"]);
         $initialYear = $initialYear[0]["initial_year"];
-
         $firstKey = array_key_first($_POST);
         $arrYear = explode("_",$firstKey);
         $arrYear = $arrYear[1];

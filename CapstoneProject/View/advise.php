@@ -44,7 +44,6 @@ $model = new Model();
   </head>
   <body>
 
-   
   <div class= "header_footer">
     <h1>Student Plans</h1>
   </div>
@@ -67,85 +66,24 @@ $model = new Model();
         echo "NO sql injection please!!";
       } else
       {
-
-        $schoolYear = date("Y");
-        $month = date("m");
-        if($month <= 7) 
-        {
-          $schoolYear--;
-        }
-
+        $schoolYear = $model->getSchoolYear();
         $_SESSION["saved"] = $model->makeNewPlan($_SESSION["token"], $schoolYear);
-        
         //INIT PLAN DB for this start school year so the token doesnt get thrown out
         $model->initPLanDB($_SESSION["token"]);
-
-        $_SESSION["fall"] = "";
-        $_SESSION["winter"] = "";
-        $_SESSION["spring"] = "";
-        $_SESSION["summer"] = "";
-        $_SESSION["advisor"] = "";
-        $_SESSION["school_year"] = $schoolYear;
-
-        $token = $_SESSION["token"];
-        $prev = $schoolYear - 1;
-        $next = $schoolYear + 1;
-
-        //Dynamically create the button so we can limit the years added
-        echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$schoolYear'> add previous year</button>";
-        //div to append plans to
-        echo "<div id = 'all_plans'> ";
-        echo "<h1>" . $schoolYear . " School Year </h1>";
-        include("form_template.php");
-        echo "</div> ";
-        //Generate next button
-        echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$schoolYear'> add next year</button>"; 
-
+        $model->displayInitialPlanScreen($schoolYear, $_SESSION["token"]);
       }
     } else 
     {
       //retrieve data they are visiting to edit or view
       if (empty($_POST)) 
       {
+
         $otherInfo = $model->retreiveAdvisorAndTime($_SESSION["token"]);
+
         $_SESSION["saved"] = $otherInfo[0]["last_saved"];
         $_SESSION["advisor"] = $otherInfo[0]["advisor"];
+        $model->displayEmptyPostScreen($_SESSION["token"]);
 
-        $plans = $model->retreivePlansInOrder($_SESSION["token"]);
-
-        $initialYear = $model->getInitialYear($_SESSION["token"]);
-        $initialYear = $initialYear[0]["initial_year"];
-      
-         //for each plan in order
-        //update my variables and put them in session
-        //then add to the form template
-        for ($i = 0; $i < count($plans); $i++) 
-        {
-          if($i == 0)
-          {
-            $prev = $plans[$i]["school_year"] - 1;
-            //Create previous button
-            echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
-            //div to append plans to
-            echo "<div id = 'all_plans'> ";
-          }
-
-          $_SESSION["fall"] = $plans[$i]["fall"];
-          $_SESSION["winter"] = $plans[$i]["winter"];
-          $_SESSION["spring"] = $plans[$i]["spring"];
-          $_SESSION["summer"] = $plans[$i]["summer"];
-          $_SESSION["school_year"] = $plans[$i]["school_year"];
-
-          echo "<h1> " . $plans[$i]["school_year"] . " School Year</h1>";
-          include("form_template.php");          
-
-          if($i == count($plans) - 1)
-          {
-            echo "</div> ";
-            $next = $plans[$i]["school_year"] + 1;
-            echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
-          }
-        }
       }
       //then its a new save
       else 
@@ -172,77 +110,10 @@ $model = new Model();
         $firstKey = array_key_first($_POST);
         $arrYear = explode("_",$firstKey);
         $arrYear = $arrYear[1];
-        
-        while($yearsToUpdate >= 1)
-        {
-        //Update all years associated with this token
-        
-          if($yearsToUpdate == $firstYear)
-          {
-            //Must do it here to get the right value for previous
-            $prev = $arrYear - 1;
-          
-            //Create previous button
-            echo "<button type='button' name='prev_button' id='prev_button' value = '{$_SESSION['token']}:$prev:$initialYear'> add previous year</button>";
-            //div to append plans to
-            echo "<div id = 'all_plans'> ";
-          }
-
-          $key1 = "fall_$arrYear";
-          $key2 = "winter_$arrYear";
-          $key3 = "spring_$arrYear";
-          $key4 = "summer_$arrYear";
-          $yearExists = $model->yearExists($_SESSION["token"], $arrYear);
-
-          //either create new entry or update existing
-          if(!$yearExists)
-          {
-            $model->createNewPlanEntry($_SESSION["token"],$arrYear, $_POST[$key1], $_POST[$key2]
-            , $_POST[$key3], $_POST[$key4]);
-          }
-          else
-          {
-            $model->updatePlanTable($arrYear, $_POST[$key1], $_POST[$key2]
-            , $_POST[$key3], $_POST[$key4], $_SESSION["token"]
-          );
-          }
-
-          //Update our session variables
-          $_SESSION["fall"] = $_POST[$key1];
-          $_SESSION["winter"] = $_POST[$key2];
-          $_SESSION["spring"] = $_POST[$key3];
-          $_SESSION["summer"] = $_POST[$key4];
-          $_SESSION["school_year"] = $arrYear;
-        
-          echo "<h1> " . $_SESSION["school_year"] . " School Year </h1>";
-
-          //Display the updated page
-          include("form_template.php");
-
-          if($yearsToUpdate == 1)
-          {
-            $next = $arrYear + 1;
-
-            echo "</div> ";
-            echo "<button type='button' name='next_button' id='next_button' value = '{$_SESSION['token']}:$next:$initialYear'> add next year</button>"; 
-          }
-        
-          $arrYear++;
-          $yearsToUpdate -= 1;
-        }
+        $model->displayAfterSave($yearsToUpdate, $firstYear, $_SESSION["token"], $initialYear, $arrYear);
       }
     }
     ?>
-
-    <div id = "button_div">
-      <button class = "plan_button" id="submit_button" type="submit" form="plan_form"> SAVE </button>  
-      <button class = "plan_button" id = "print_button" type="button"> PRINT </button>
-    </div>
-
-    <div id= "bottom_div" class="header_footer">
-      <h5> Advisor: <input type = "text" name = "advisor" value ="<?php echo htmlspecialchars($advisor)?>"></h5>
-      <h5 > Last saved on <?php echo $saved ?></h5>
-    </div>
 
   </form>
 

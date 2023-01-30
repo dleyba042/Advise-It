@@ -69,6 +69,16 @@ window.onload = () => {
       planDiv.append(form);
     }
   });
+
+  $(".view_plan").click((e) => {
+    let parentDiv = e.target.parentElement;
+    let header = document.createElement("h1");
+    header.innerHTML = e.target.id + " School Year";
+
+    parentDiv.innerHTML = "";
+    parentDiv.append(header);
+    parentDiv.append(createNewPlanForm(e.target.id));
+  });
 };
 
 const createNewPlanForm = (year) => {

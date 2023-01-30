@@ -349,6 +349,9 @@ class Model
             echo "<div id = 'all_plans'> ";
           }
 
+          //check if there is info in this plan to even display
+        if ($this->isValidPlan($plans[$i]))
+        {
           $_SESSION["fall"] = $plans[$i]["fall"];
           $_SESSION["winter"] = $plans[$i]["winter"];
           $_SESSION["spring"] = $plans[$i]["spring"];
@@ -356,7 +359,14 @@ class Model
           $_SESSION["school_year"] = $plans[$i]["school_year"];
 
           echo "<h1> " . $plans[$i]["school_year"] . " School Year</h1>";
-          include("form_template.php");          
+          include("form_template.php");
+         }
+         else
+         {
+          echo "<div>";
+          echo "<button class = 'view_plan' id = '{$plans[$i]['school_year']}' type = 'button' class = 'plan_edit 'name = '{$plans[$i]['school_year']}'> Edit Blank Plan for Year {$plans[$i]['school_year']} </button>";
+          echo "</div>";
+        }
 
           if($i == count($plans) - 1)
           {
@@ -429,6 +439,12 @@ class Model
           $_SESSION["school_year"] = $year;
 
           return array($key1, $key2, $key3, $key4);
+    }
+
+    function isValidPlan($plan)
+    {
+      return strlen($plan["fall"]) !== 0 || strlen($plan["winter"]) !== 0 ||
+      strlen($plan["spring"]) !== 0 || strlen($plan["summer"]) !== 0 ;
     }
 
       

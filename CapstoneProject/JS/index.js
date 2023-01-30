@@ -21,7 +21,7 @@ adminButton.addEventListener("click", () => {
 });
 
 loginButton.addEventListener("click", () => {
-  if (username.value == "admin" && password.value == "@dm1n") {
+  if (username.value == "admin" && password.value == "admin") {
     removeError(userWarning);
     removeError(passWarning);
     window.location = "admin.php";

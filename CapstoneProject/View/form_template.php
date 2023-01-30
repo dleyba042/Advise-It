@@ -1,8 +1,4 @@
 <?php
-//Lets set my variables here
-//All previously saved info 
-//and it will deal with updates to
-
 $saved = $_SESSION["saved"];
 $fall = $_SESSION["fall"];
 $winter = $_SESSION["winter"];
@@ -10,9 +6,7 @@ $spring = $_SESSION["spring"];
 $summer = $_SESSION["summer"];
 $advisor = $_SESSION["advisor"];
 $year = $_SESSION["school_year"];
-
 ?>
-
     <div class = "plan_container">  
       
       <div class = "textContainer">

@@ -70,6 +70,7 @@ window.onload = () => {
     }
   });
 
+  //Event listener to switch between a blank plan button and an editable form
   $(".view_plan").click((e) => {
     let parentDiv = e.target.parentElement;
     let header = document.createElement("h1");
@@ -81,6 +82,11 @@ window.onload = () => {
   });
 };
 
+/**
+ * Creates a plan form to be appended to the display using the provied year
+ * @param {int} year
+ * @returns
+ */
 const createNewPlanForm = (year) => {
   let container = document.createElement("div");
   container.classList.add("plan_container");

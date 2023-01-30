@@ -75,8 +75,8 @@ class Model
       }
 
       /**
-       * 
-       *
+       * Makes an initial entry for a plan in the database
+       * when the token is first created.
        * @param mixed $token
        * @param mixed $yearNum
        * @return int|string the shcool year that this plan was created
@@ -101,6 +101,17 @@ class Model
         return $schoolYear;
       }
 
+       /**
+        * Updates all info for the specific school year and token provided
+        * @param mixed $schoolYear
+        * @param mixed $fall
+        * @param mixed $winter
+        * @param mixed $spring
+        * @param mixed $summer
+        * @param mixed $token
+        * @return void
+        */
+
       function updatePlanTable($schoolYear,$fall,$winter,$spring,$summer,$token)
       {
 
@@ -118,6 +129,14 @@ class Model
         $updateStatement->bindParam(":token", $token);
         $updateStatement->execute();
       }
+
+       /**
+        * updates all token table info with the token provided
+        * @param mixed $token
+        * @param mixed $saved
+        * @param mixed $advisor
+        * @return void
+        */
 
       function updateTokenTable($token, $saved, $advisor)
       {
@@ -140,8 +159,6 @@ class Model
        */
       function makeNewPlan($token,$initialYear)
       {
-      
-      //Statement to insert the token  
       $insertSql = "INSERT INTO `Token_Info`(`token`,`last_saved`, `initial_year`) VALUES 
       (:token,:saved, :initial)";
       
@@ -156,6 +173,12 @@ class Model
       return $saved;  
       }
 
+       /**
+        * retieves the school years of all plans associated with the provided token
+        * @param mixed $token
+        * @return array
+        */
+
       function getSchoolYearsInOrder($token)
       {
           $sql = "SELECT `school_year` FROM `Plan_Info` 
@@ -167,13 +190,11 @@ class Model
           return  $statement->fetchAll(PDO::FETCH_ASSOC);        
       }
       
-
-       /**
-        * get every plan associated with this token in sorted order by plan number
-        * @param mixed $token
-        * @return array
-        */
-
+      /**
+      * get every plan associated with this token in sorted order by plan number
+      * @param mixed $token
+      * @return array
+      */
       function retreivePlansInOrder($token)
       {
         $selectSQL = "SELECT `fall`,`winter`,`spring`,`summer`, `school_year` FROM `Plan_Info` 
@@ -187,7 +208,7 @@ class Model
       }
 
        /**
-        * retreive advisor andtim saved info associated with this token
+        * retreive advisor and time saved info associated with this token
         * @param mixed $token
         * @return array
         */
@@ -204,14 +225,12 @@ class Model
        return $selectStatement->fetchAll((PDO::FETCH_ASSOC));
       }
 
-
       //
       /**
         * Retrieves all data currently stored in the database
         * @param mixed $token
         * @return array
         */
-
         function retrieveAllData()
         {
           $selectSQL = "SELECT Token_Info.token, Token_Info.last_saved, Token_Info.advisor,Plan_Info.fall, Plan_Info.winter, Plan_Info.spring, Plan_Info.summer, Plan_Info.school_year
@@ -229,7 +248,6 @@ class Model
       * retrieves an array of all existing tokens in db so as not to duplicate
       * @return array
       */
-
     function getExistingTokens()
     {
       $sql = "SELECT `token` FROM `Token_Info`";
@@ -238,24 +256,11 @@ class Model
       return $statement->fetchAll((PDO::FETCH_ASSOC));
     } 
 
-     /**
-      * Create initial entry in plan_info table for this new school year
-      * @param mixed $token
-      * @param mixed $year
-      * @return mixed
-      */
-
-    function initNewPlanYear($token,$year)
-    {
-        $insertSql = "INSERT INTO `Plan_Info`(`token`,`school_year`) 
-        VALUES (:token, :schoolYear)";
-
-        $insertStatement = $this->_dbo->prepare($insertSql);
-        $insertStatement->bindParam(":token", $token);
-        $insertStatement->bindParam(":schoolYear", $year);                 
-        $insertStatement->execute();
-    }
-
+    /**
+     * gets the initial year the plan was created to bound the years of the plan buttons
+     * @param mixed $token
+     * @return array
+     */
     function getInitialYear($token)
     {
        $sql = "SELECT `initial_year` 
@@ -265,6 +270,13 @@ class Model
        $statement->execute();
        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
+
+     /**
+      * determines if their an entry in the plan database for the token and school year provided
+      * @param mixed $token
+      * @param mixed $year
+      * @return bool
+      */
 
     function yearExists($token, $year)
     {
@@ -278,6 +290,16 @@ class Model
       return count($count) != 0;
     }
 
+    /**
+     * Creates a new entry in the plan database for the provided information
+     * @param mixed $token
+     * @param mixed $year
+     * @param mixed $fall
+     * @param mixed $winter
+     * @param mixed $spring
+     * @param mixed $summer
+     * @return void
+     */
     function createNewPlanEntry($token,$year,$fall,$winter,$spring,$summer)
     {
       $insertSql = "INSERT INTO `Plan_Info`(`school_year`, `fall`, `winter`, `spring`, `summer`, `token`) 
@@ -293,6 +315,10 @@ class Model
         $statement->execute();
     }
 
+    /**
+     * logic to determine starting school year
+     * @return int|string
+     */
     function getSchoolYear()
     {
       $schoolYear = date("Y");
@@ -304,6 +330,12 @@ class Model
       return $schoolYear;
     }
 
+    /**
+     * Display of the screen upon initial plan creation
+     * @param mixed $schoolYear
+     * @param mixed $token
+     * @return void
+     */
     function displayInitialPlanScreen($schoolYear, $token)
     {
       $_SESSION["fall"] = "";
@@ -329,6 +361,11 @@ class Model
       include("footer.php");
     }
 
+    /**
+     * Display of the screen when visiting token link
+     * @param mixed $token
+     * @return void
+     */
     function displayEmptyPostScreen($token)
     {
         $plans = $this->retreivePlansInOrder($token);
@@ -379,6 +416,15 @@ class Model
         include("footer.php");
     }
 
+    /**
+     * Display of the screen after saving new information
+     * @param mixed $yearsToUpdate
+     * @param mixed $firstYear
+     * @param mixed $token
+     * @param mixed $initialYear
+     * @param mixed $arrYear
+     * @return void
+     */
     function displayAfterSave($yearsToUpdate,$firstYear,$token, $initialYear,$arrYear)
     {
       while($yearsToUpdate >= 1)
@@ -425,6 +471,11 @@ class Model
         include("footer.php");
     }
 
+    /**
+     * helper function to update session
+     * @param mixed $year
+     * @return array<string>
+     */
     function updateSession($year)
     {
           $key1 = "fall_$year";
@@ -441,12 +492,15 @@ class Model
           return array($key1, $key2, $key3, $key4);
     }
 
+    /**
+     * helper function for validation
+     * @param mixed $plan
+     * @return bool
+     */
     function isValidPlan($plan)
     {
       return strlen($plan["fall"]) !== 0 || strlen($plan["winter"]) !== 0 ||
       strlen($plan["spring"]) !== 0 || strlen($plan["summer"]) !== 0 ;
     }
-
-      
 }
 ?>
